@@ -327,10 +327,11 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ffip-rust-fd-extra-opts "-e el -e sh")
  '(goggles-pulse-delay 0.1)
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
- '(package-selected-packages nil)
+ '(package-selected-packages '(solarized-theme spacemacs-theme zenburn-theme))
  '(savehist-additional-variables '(kill-ring))
  '(warning-suppress-types '((comp))))
 
@@ -380,55 +381,96 @@
   (setq display-time-24hr-format t)
   (setq display-time-day-and-date t))
 
-; mozcの設定 
-(require 'mozc)
-(require 'mozc-popup) ;;
-(require 'mozc-cursor-color)
-(set-language-environment "Japanese")
-(setq default-input-method "japanese-mozc")
-(setq mozc-candidate-style 'popup)
-; mozc カーソルカラーを設定する
-(setq mozc-cursor-color-alist '((direct        . "LightYellow")
-                                (read-only     . "yellow")
-                                (hiragana      . "green")
-                                (full-katakana . "goldenrod")
-                                (half-ascii    . "dark orchid")
-                                (full-ascii    . "orchid")
-                                (half-katakana . "dark goldenrod")))
 
-; 全角半角キーで on/off
-(global-set-key [zenkaku-hankaku] 'toggle-input-method)
-; 変換キーでon
-(global-set-key [henkan]
-		(lambda () (interactive)
-		  (when (null current-input-method) (toggle-input-method))))
+(add-to-list 'load-path "~/.emacs.d/lisp/ddskk-16.2")
+;(require 'skk-autoloads)
+(require 'skk)
+(require 'skk-cus)
+(require 'skk-cursor)
+(require 'skk-tankan)
+(require 'skk-cdb)
+(global-set-key "\C-x\C-j" 'skk-mode)
+(global-set-key "\C-xj" 'skk-auto-fill-mode)
+(global-set-key "\C-xt" 'skk-tutorial)
 
-; Hangulでon
-(global-set-key [Hangul]
-		(lambda () (interactive)
-		  (when (null current-input-method) (toggle-input-method))))
+(setq skk-user-directory "~/.emacs.d/ddskk-16.2")
+;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO.L")
+(setq skk-cdb-large-jisyo "/usr/share/skk/SKK-JISYO.L.cdb")
+;(setq skk-large-jisyo "~/.emacs.d/skk/SKK-JISYO.L")
+;(setq skk-server-host "localhost")
+;(setq skk-server-portnum 1178)
+;(global-set-key (kbd "C-x C-j") 'skk-mode)
+;(set-input-method "japanese-skk")
+;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO")
+;(toggle-input-method nil)
 
-; 無変換キーでoff
-(global-set-key [muhenkan]
-		(lambda () (interactive)
-		  (deactivate-input-method)))
-; Hangul_Hanjaキーでoff
-(global-set-key [Hangul_Hanja]
-		(lambda () (interactive)
-		  (deactivate-input-method)))
+;; ddskk
+;; 「カタカナ/ひらがな」キーで SKK を起動する
+;(global-set-key [hiragana-katakana] 'skk-mode)
 
-; 全角半角キーと無変換キーのキーイベントを横取りする
-(defadvice mozc-handle-event (around intercept-keys (event))
-  "Intercept keys muhenkan and zenkaku-hankaku, before passing keys
-to mozc-server (which the function mozc-handle-event does), to
-properly disable mozc-mode."
-  (if (member event (list 'zenkaku-hankaku 'muhenkan))
-      (progn
-	(mozc-clean-up-session)
-	(toggle-input-method))
-    (progn ;(message "%s" event) ;debug
-      ad-do-it)))
-(ad-activate 'mozc-handle-event)
+;; ~/.skk にいっぱい設定を書いているのでバイトコンパイルしたい
+;(setq skk-byte-compile-init-file t)
+;; 注) 異なる種類の Emacsen を使っている場合は nil にします
+
+;; SKK を Emacs の input method として使用する
+;;   `toggle-input-method' (C-\) で DDSKK が起動します
+;(setq default-input-method
+;      "japanese-skk"			; (skk-mode 1)
+;;;    "japanese-skk-auto-fill"		; (skk-auto-fill-mode 1)
+;      )
+
+;; SKK を起動していなくても、いつでも skk-isearch を使う
+;(setq skk-isearch-mode-enable 'always)
+
+;; ; mozcの設定 
+;; (require 'mozc)
+;; (require 'mozc-popup) ;;
+;; (require 'mozc-cursor-color)
+;; (set-language-environment "Japanese")
+;; (setq default-input-method "japanese-mozc")
+;; (setq mozc-candidate-style 'popup)
+;; ; mozc カーソルカラーを設定する
+;; (setq mozc-cursor-color-alist '((direct        . "LightYellow")
+;;                                 (read-only     . "yellow")
+;;                                 (hiragana      . "green")
+;;                                 (full-katakana . "goldenrod")
+;;                                 (half-ascii    . "dark orchid")
+;;                                 (full-ascii    . "orchid")
+;;                                 (half-katakana . "dark goldenrod")))
+
+;; ; 全角半角キーで on/off
+;; (global-set-key [zenkaku-hankaku] 'toggle-input-method)
+;; ; 変換キーでon
+;; (global-set-key [henkan]
+;; 		(lambda () (interactive)
+;; 		  (when (null current-input-method) (toggle-input-method))))
+
+;; ; Hangulでon
+;; (global-set-key [Hangul]
+;; 		(lambda () (interactive)
+;; 		  (when (null current-input-method) (toggle-input-method))))
+
+;; ; 無変換キーでoff
+;; (global-set-key [muhenkan]
+;; 		(lambda () (interactive)
+;; 		  (deactivate-input-method)))
+;; ; Hangul_Hanjaキーでoff
+;; (global-set-key [Hangul_Hanja]
+;; 		(lambda () (interactive)
+;; 		  (deactivate-input-method)))
+
+;; ; 全角半角キーと無変換キーのキーイベントを横取りする
+;; (defadvice mozc-handle-event (around intercept-keys (event))
+;;   "Intercept keys muhenkan and zenkaku-hankaku, before passing keys
+;; to mozc-server (which the function mozc-handle-event does), to
+;; properly disable mozc-mode."
+;;   (if (member event (list 'zenkaku-hankaku 'muhenkan))
+;;       (progn
+;; 	(mozc-clean-up-session)
+;; 	(toggle-input-method))
+;;     (progn ;(message "%s" event) ;debug
+;;       ad-do-it)))
+;; (ad-activate 'mozc-handle-event)
 
 
 ;.20. warning
@@ -1118,13 +1160,16 @@ properly disable mozc-mode."
   (add-to-list 'load-path (locate-user-emacs-file "el-clone/markdown-mode"))
   (autoload-if-found '(mark-down-mode) "markdown-mode" nil t))
 
-;; (eval-when-compile
-;;   (el-clone :repo "tumashu/postframe"))
-;; (with-delayed-execution
-;;   (message "Install postframe...")
-;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/postframe"))
-;;   (autoload-if-found '(postframe) "postframe" nil t))
-
+ (eval-when-compile
+   (el-clone :repo "tumashu/posframe"))
+ (with-delayed-execution
+   (message "Install posframe...")
+   (add-to-list 'load-path (locate-user-emacs-file "el-clone/posframe"))
+   (autoload-if-found '(postframe) "posframe" nil t)
+   (require 'ddskk-posframe)
+   (require 'facemenu)
+   (ddskk-posframe-mode t)
+)
 
 ;.22.12. lsp-bridge
 (eval-when-compile
@@ -1268,6 +1313,38 @@ properly disable mozc-mode."
   (with-eval-after-load 'xref
     (setq xref-show-xrefs-function #'consult-xref)
     (setq xref-show-definitions-function #'consult-xref)))
+
+
+
+;;https://github.com/jdtsmith/consult-ripfd
+(eval-when-compile
+  (el-clone :repo "jdtsmith/consult-ripfd"))
+
+(with-delayed-execution
+  (message "Install consult-ripfd...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/consult-ripfd"))
+
+  (autoload-if-found '(consult-ripfd) "consult-ripfd" nil t)
+  (autoload-if-found '(consult-ripfd-full) "consult-ripfd" nil t)
+  (global-set-key (kbd "C-c g") #'consult-ripfd)
+)
+
+
+
+;; ast-grep.el
+; https://github.com/SunskyXH/ast-grep.el
+(eval-when-compile
+  (el-clone :repo "SunskyXH/ast-grep.el"))
+
+(with-delayed-execution
+  (message "Install ast-grep.el...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/ast-grep"))
+
+  (autoload-if-found '(ast-grep-search) "ast-grep" nil t)
+  (autoload-if-found '(ast-grep-project) "ast-grep" nil t)
+  (autoload-if-found '(ast-grep-directory) "ast-grep" nil t)
+)
+
 
 
 ;; tramp
@@ -2104,6 +2181,16 @@ properly disable mozc-mode."
   (autoload-if-found '(mistty) "mistty" nil t))
 
 
+; https://github.com/sabof/org-bullets
+;; (eval-when-compile
+;;   (el-clone :repo "sabof/org-bullets"))
+;; (with-delayed-execution
+;;   (message "Install org-bullets...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/org-bullets"))
+;;   (autoload-if-found '(org-bullets) "org-bullets" nil t)
+;;   ;(add-hook 'org-mode-hook #'org-bullets)
+;;   (setq org-bullet-mode 1)
+;; )
 
 
 ; ox-qmd org-mode to qiita markdown export C-c C-e
@@ -3398,6 +3485,11 @@ The DWIM behaviour of this command is as follows:
 (setq x-select-enable-clipboard t)
 (setq split-height-threshold nil)
 
+
+(require 'rtags)
+(setq rtags-path "~/rtags/bin")
+
+
 ;6.1. byte-compileする
 ;; (eval-when-compile
 ;;   (el-clone-byte-compile))
@@ -3689,8 +3781,7 @@ The DWIM behaviour of this command is as follows:
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- ;'(default ((t (:background "#282a36" :foreground "#f8f8f2"))))
- '(default ((t (:background "#151515" :foreground "#f8f8f2"))))
+ '(default ((t (:background "#282a36" :foreground "#f8f8f2"))))
  '(goggles-added ((t (:background "#010101"))))
  '(goggles-changed ((t (:background "#c9ba99"))))
  '(goggles-removed ((t (:background "#fabfbb"))))

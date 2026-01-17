@@ -54,6 +54,12 @@
 (setq truncate-lines t)
 (setq truncate-partial-width-windows t)
 
+; スクロールバーは右
+(setq scroll-bar-mode 'right)
+(setq frame-current-scroll-bars 'right)
+(setq window-scroll-bars 'right)
+(setq vertical-scroll-bar 'right)
+
 ;.14. scratch buffer
 (setq initial-scratch-message nil)
 ; org は早めにloadしておくと後が楽. ただ起動を早くしたい場合は止めることは可能.
