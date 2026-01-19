@@ -382,95 +382,95 @@
   (setq display-time-day-and-date t))
 
 
-(add-to-list 'load-path "~/.emacs.d/lisp/ddskk-16.2")
-;(require 'skk-autoloads)
-(require 'skk)
-(require 'skk-cus)
-(require 'skk-cursor)
-(require 'skk-tankan)
-(require 'skk-cdb)
-(global-set-key "\C-x\C-j" 'skk-mode)
-(global-set-key "\C-xj" 'skk-auto-fill-mode)
-(global-set-key "\C-xt" 'skk-tutorial)
+;; (add-to-list 'load-path "~/.emacs.d/lisp/ddskk-16.2")
+;; ;(require 'skk-autoloads)
+;; (require 'skk)
+;; (require 'skk-cus)
+;; (require 'skk-cursor)
+;; (require 'skk-tankan)
+;; (require 'skk-cdb)
+;; (global-set-key "\C-x\C-j" 'skk-mode)
+;; (global-set-key "\C-xj" 'skk-auto-fill-mode)
+;; (global-set-key "\C-xt" 'skk-tutorial)
 
-(setq skk-user-directory "~/.emacs.d/ddskk-16.2")
-;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO.L")
-(setq skk-cdb-large-jisyo "/usr/share/skk/SKK-JISYO.L.cdb")
-;(setq skk-large-jisyo "~/.emacs.d/skk/SKK-JISYO.L")
-;(setq skk-server-host "localhost")
-;(setq skk-server-portnum 1178)
-;(global-set-key (kbd "C-x C-j") 'skk-mode)
-;(set-input-method "japanese-skk")
-;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO")
-;(toggle-input-method nil)
+;; (setq skk-user-directory "~/.emacs.d/ddskk-16.2")
+;; ;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO.L")
+;; (setq skk-cdb-large-jisyo "/usr/share/skk/SKK-JISYO.L.cdb")
+;; ;(setq skk-large-jisyo "~/.emacs.d/skk/SKK-JISYO.L")
+;; ;(setq skk-server-host "localhost")
+;; ;(setq skk-server-portnum 1178)
+;; ;(global-set-key (kbd "C-x C-j") 'skk-mode)
+;; ;(set-input-method "japanese-skk")
+;; ;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO")
+;; ;(toggle-input-method nil)
 
-;; ddskk
-;; 「カタカナ/ひらがな」キーで SKK を起動する
-;(global-set-key [hiragana-katakana] 'skk-mode)
+;; ;; ddskk
+;; ;; 「カタカナ/ひらがな」キーで SKK を起動する
+;; ;(global-set-key [hiragana-katakana] 'skk-mode)
 
-;; ~/.skk にいっぱい設定を書いているのでバイトコンパイルしたい
-;(setq skk-byte-compile-init-file t)
-;; 注) 異なる種類の Emacsen を使っている場合は nil にします
+;; ;; ~/.skk にいっぱい設定を書いているのでバイトコンパイルしたい
+;; ;(setq skk-byte-compile-init-file t)
+;; ;; 注) 異なる種類の Emacsen を使っている場合は nil にします
 
-;; SKK を Emacs の input method として使用する
-;;   `toggle-input-method' (C-\) で DDSKK が起動します
-;(setq default-input-method
-;      "japanese-skk"			; (skk-mode 1)
-;;;    "japanese-skk-auto-fill"		; (skk-auto-fill-mode 1)
-;      )
+;; ;; SKK を Emacs の input method として使用する
+;; ;;   `toggle-input-method' (C-\) で DDSKK が起動します
+;; ;(setq default-input-method
+;; ;      "japanese-skk"			; (skk-mode 1)
+;; ;;;    "japanese-skk-auto-fill"		; (skk-auto-fill-mode 1)
+;; ;      )
 
-;; SKK を起動していなくても、いつでも skk-isearch を使う
-;(setq skk-isearch-mode-enable 'always)
+;; ;; SKK を起動していなくても、いつでも skk-isearch を使う
+;; ;(setq skk-isearch-mode-enable 'always)
 
-;; ; mozcの設定 
-;; (require 'mozc)
-;; (require 'mozc-popup) ;;
-;; (require 'mozc-cursor-color)
-;; (set-language-environment "Japanese")
-;; (setq default-input-method "japanese-mozc")
-;; (setq mozc-candidate-style 'popup)
-;; ; mozc カーソルカラーを設定する
-;; (setq mozc-cursor-color-alist '((direct        . "LightYellow")
-;;                                 (read-only     . "yellow")
-;;                                 (hiragana      . "green")
-;;                                 (full-katakana . "goldenrod")
-;;                                 (half-ascii    . "dark orchid")
-;;                                 (full-ascii    . "orchid")
-;;                                 (half-katakana . "dark goldenrod")))
+; mozcの設定 
+(require 'mozc)
+(require 'mozc-popup) ;;
+(require 'mozc-cursor-color)
+(set-language-environment "Japanese")
+(setq default-input-method "japanese-mozc")
+(setq mozc-candidate-style 'popup)
+; mozc カーソルカラーを設定する
+(setq mozc-cursor-color-alist '((direct        . "LightYellow")
+                                (read-only     . "yellow")
+                                (hiragana      . "green")
+                                (full-katakana . "goldenrod")
+                                (half-ascii    . "dark orchid")
+                                (full-ascii    . "orchid")
+                                (half-katakana . "dark goldenrod")))
 
-;; ; 全角半角キーで on/off
-;; (global-set-key [zenkaku-hankaku] 'toggle-input-method)
-;; ; 変換キーでon
-;; (global-set-key [henkan]
-;; 		(lambda () (interactive)
-;; 		  (when (null current-input-method) (toggle-input-method))))
+; 全角半角キーで on/off
+(global-set-key [zenkaku-hankaku] 'toggle-input-method)
+; 変換キーでon
+(global-set-key [henkan]
+		(lambda () (interactive)
+		  (when (null current-input-method) (toggle-input-method))))
 
-;; ; Hangulでon
-;; (global-set-key [Hangul]
-;; 		(lambda () (interactive)
-;; 		  (when (null current-input-method) (toggle-input-method))))
+; Hangulでon
+(global-set-key [Hangul]
+		(lambda () (interactive)
+		  (when (null current-input-method) (toggle-input-method))))
 
-;; ; 無変換キーでoff
-;; (global-set-key [muhenkan]
-;; 		(lambda () (interactive)
-;; 		  (deactivate-input-method)))
-;; ; Hangul_Hanjaキーでoff
-;; (global-set-key [Hangul_Hanja]
-;; 		(lambda () (interactive)
-;; 		  (deactivate-input-method)))
+; 無変換キーでoff
+(global-set-key [muhenkan]
+		(lambda () (interactive)
+		  (deactivate-input-method)))
+; Hangul_Hanjaキーでoff
+(global-set-key [Hangul_Hanja]
+		(lambda () (interactive)
+		  (deactivate-input-method)))
 
-;; ; 全角半角キーと無変換キーのキーイベントを横取りする
-;; (defadvice mozc-handle-event (around intercept-keys (event))
-;;   "Intercept keys muhenkan and zenkaku-hankaku, before passing keys
-;; to mozc-server (which the function mozc-handle-event does), to
-;; properly disable mozc-mode."
-;;   (if (member event (list 'zenkaku-hankaku 'muhenkan))
-;;       (progn
-;; 	(mozc-clean-up-session)
-;; 	(toggle-input-method))
-;;     (progn ;(message "%s" event) ;debug
-;;       ad-do-it)))
-;; (ad-activate 'mozc-handle-event)
+; 全角半角キーと無変換キーのキーイベントを横取りする
+(defadvice mozc-handle-event (around intercept-keys (event))
+  "Intercept keys muhenkan and zenkaku-hankaku, before passing keys
+to mozc-server (which the function mozc-handle-event does), to
+properly disable mozc-mode."
+  (if (member event (list 'zenkaku-hankaku 'muhenkan))
+      (progn
+	(mozc-clean-up-session)
+	(toggle-input-method))
+    (progn ;(message "%s" event) ;debug
+      ad-do-it)))
+(ad-activate 'mozc-handle-event)
 
 
 ;.20. warning
@@ -1166,9 +1166,9 @@
    (message "Install posframe...")
    (add-to-list 'load-path (locate-user-emacs-file "el-clone/posframe"))
    (autoload-if-found '(postframe) "posframe" nil t)
-   (require 'ddskk-posframe)
-   (require 'facemenu)
-   (ddskk-posframe-mode t)
+   ;; (require 'ddskk-posframe) 
+   ;; (require 'facemenu)
+   ;; (ddskk-posframe-mode t)
 )
 
 ;.22.12. lsp-bridge
@@ -3029,6 +3029,27 @@ This needs more work, to handle headings with lots of spaces in them."
 
 ;; (with-eval-after-load 'org-src
 ;;   (add-to-list 'org-src-lang-modes '("treesitter" . treesitter)))
+
+
+
+; mark jump https://github.com/DamianB-BitFlipper/javelin.el
+(eval-when-compile
+  (el-clone :repo "DamianB-BitFlipper/javelin.el"))
+(with-delayed-execution
+  (message "Install javelin...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/javelin"))
+  (autoload-if-found '(javelin-go-or-assign-to-1) "javelin" nil t)
+  (autoload-if-found '(javelin-go-or-assign-to-2) "javelin" nil t)
+  (autoload-if-found '(javelin-go-or-assign-to-3) "javelin" nil t)
+  (autoload-if-found '(javelin-go-or-assign-to-4) "javelin" nil t)
+  (autoload-if-found '(javelin-go-or-assign-to-5) "javelin" nil t)
+  (autoload-if-found '(javelin-go-or-assign-to-6) "javelin" nil t)
+  (autoload-if-found '(javelin-go-or-assign-to-7) "javelin" nil t)
+  (autoload-if-found '(javelin-go-or-assign-to-8) "javelin" nil t)
+  (autoload-if-found '(javelin-go-or-assign-to-9) "javelin" nil t)
+  (autoload-if-found '(javelin-toggle-quick-menu) "javelin" nil t)
+  (setq global-javelin-minor-mode 1))
+
 
 
 ; ggtags
