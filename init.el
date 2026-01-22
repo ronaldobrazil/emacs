@@ -3048,7 +3048,23 @@ This needs more work, to handle headings with lots of spaces in them."
   (autoload-if-found '(javelin-go-or-assign-to-8) "javelin" nil t)
   (autoload-if-found '(javelin-go-or-assign-to-9) "javelin" nil t)
   (autoload-if-found '(javelin-toggle-quick-menu) "javelin" nil t)
-  (setq global-javelin-minor-mode 1))
+
+  (global-set-key (kbd "s-a") 'javelin-go-or-assign-to-1)
+  (global-set-key (kbd "s-C-a") 'javelin-delete-1)
+  (global-set-key (kbd "s-s") 'javelin-go-or-assign-to-2)
+  (global-set-key (kbd "s-C-s") 'javelin-delete-2)
+  (global-set-key (kbd "s-d") 'javelin-go-or-assign-to-3)
+  (global-set-key (kbd "s-C-d") 'javelin-delete-3)
+  (global-set-key (kbd "s-f") 'javelin-go-or-assign-to-4)
+  (global-set-key (kbd "s-C-f") 'javelin-delete-4)
+  (global-set-key (kbd "s-g") 'javelin-go-or-assign-to-5)
+  (global-set-key (kbd "s-C-g") 'javelin-delete-5)
+  (global-set-key (kbd "s-l") 'javelin-toggle-quick-menu)
+  (setq global-javelin-minor-mode 1)
+    
+  (add-hook 'prog-mode-hook 'global-javelin-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'global-javelin-minor-mode)
+)
 
 
 
