@@ -1486,6 +1486,19 @@ properly disable mozc-mode."
 
 
 
+; https://github.com/ZenScriptor/avy-flash 
+(eval-when-compile
+  (el-clone :repo "ZenScriptor/avy-flash"))
+
+(with-delayed-execution
+  (message "Install avy-flash...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/avy-flash"))
+  (autoload-if-found '(avy-flash-jump) "avy-flash" nil t)
+  (global-set-key (kbd "C-M-;") 'avy-flash-jump)
+)
+
+
+
 ;14.4. embark
 (eval-when-compile
   (el-clone :repo "oantolin/embark"))
@@ -2410,8 +2423,20 @@ properly disable mozc-mode."
 (global-set-key (kbd "C-c j") 'my/org-journal-open)
 
 
-;2.1.12. org-pomodoro
 
+; https://github.com/jwiegley/alert
+(eval-when-compile
+  (el-clone :repo "jwiegley/alert"))
+
+(with-delayed-execution
+  (message "Install alert...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/alert"))
+
+  (autoload-if-found '(alert) "alert" nil t))
+
+
+
+;2.1.12. org-pomodoro
 (eval-when-compile
   (el-clone :repo "marcinkoziej/org-pomodoro"))
 
@@ -2419,7 +2444,14 @@ properly disable mozc-mode."
   (message "Install org-pomodoro...")
   (add-to-list 'load-path (locate-user-emacs-file "el-clone/org-pomodoro"))
 
-  (autoload-if-found '(org-pomodoro) "org-pomodoro" nil t))
+  (autoload-if-found '(org-pomodoro) "org-pomodoro" nil t)
+
+  ;https://wand-ta.hatenablog.com/entry/2019/04/30/212913
+  (setq-default mode-line-format
+      (cons (car mode-line-format)
+            (cons 'org-pomodoro-mode-line
+                  (cdr mode-line-format))))
+)
 
 
 ;2.2.1. org-faces
@@ -3060,10 +3092,10 @@ This needs more work, to handle headings with lots of spaces in them."
   (global-set-key (kbd "s-g") 'javelin-go-or-assign-to-5)
   (global-set-key (kbd "s-C-g") 'javelin-delete-5)
   (global-set-key (kbd "s-l") 'javelin-toggle-quick-menu)
-  (setq global-javelin-minor-mode 1)
+ ;(setq global-javelin-minor-mode 1)
     
-  (add-hook 'prog-mode-hook 'global-javelin-minor-mode)
-  (add-hook 'emacs-lisp-mode-hook 'global-javelin-minor-mode)
+ ; (add-hook 'prog-mode-hook 'global-javelin-minor-mode)
+ ; (add-hook 'emacs-lisp-mode-hook 'global-javelin-minor-mode)
 )
 
 
@@ -3489,7 +3521,6 @@ The DWIM behaviour of this command is as follows:
 (global-unset-key (kbd "M-,") ) 
 (global-set-key (kbd "M-,") 'beginning-of-buffer)
 (global-set-key (kbd "M-.") 'end-of-buffer)
-
 
 
 ;; カーソル下のシンボルを拾ってconsult-line発動
