@@ -848,6 +848,10 @@ properly disable mozc-mode."
   (autoload-if-found '(swiper) "swiper" nil t)
   (autoload-if-found '(swiper-migemo-or-region) "swiper" nil t)
 
+(setq swiper-include-line-number-in-search t) ; 検索対象に行番号を含める
+(setq ivy-count-format "(%d/%d) ") ; 候補数の表示形式
+(setq ivy-display-style 'fancy) ; 華やかな表示
+
 (defun swiper-migemo()
 (interactive)
 (require 'ivy-with-migemo)
@@ -861,7 +865,8 @@ properly disable mozc-mode."
 (migemo-kill) ; migemoシャットダウン
 (migemo-init) ; migemo再起動
 (global-ivy-with-migemo-mode 1) ; 有効化
-(swiper-isearch)
+(swiper-isearch) ; 行数が多い場合はこちらを使う方が早いが、行番号が出ない
+;(swiper) ; 行番号が表示されるが、行数が多い場合は遅い
 )
 
 ; https://qiita.com/minoruGH/items/20d7664a3a57c7365ebc
@@ -1369,6 +1374,51 @@ properly disable mozc-mode."
   (autoload-if-found '(consult-ripfd-full) "consult-ripfd" nil t)
   (global-set-key (kbd "C-c g") #'consult-ripfd)
 )
+
+
+; https://github.com/armindarvish/consult-omni
+(eval-when-compile
+  (el-clone :repo "armindarvish/consult-omni"))
+
+(with-delayed-execution
+  (message "Install consult-omni...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/consult-omni"))
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/consult-omni/sources"))
+  (autoload-if-found '(consult-omni) "consult-omni" nil t)
+  (require 'consult-omni-sources)
+  (require 'consult-omni-embark)
+  (setq consult-omni-show-preview t)
+  (setq consult-omni-sources-modules-to-load (list 'consult-omni-wikipedia 'consult-omni-duckduckgo))
+  (consult-omni-sources-load-modules)
+  (setq consult-omni-dynamic-input-debounce 1.0)
+  (setq consult-omni-dynamic-refresh-delay consult-omni-dynamic-input-debounce)
+  (setq consult-omni-default-interactive-command #'consult-omni-multi)
+  ;(setq consult-omni-multi-sources '(consult-omni--source-google))
+  ;(autoload-if-found '(consult-omni-multi) "consult-omni" nil t)
+  ;(autoload-if-found '(consult-omni-multi-static) "consult-omni" nil t)
+  ;(autoload-if-found '(consult-omni-sources) "consult-omni-sources" nil t)
+  ;(autoload-if-found '(consult-omni-sources-load-modules) "consult-omni-sources" nil t)
+  ;(autoload-if-found '(consult-omni-wikipedia) "consult-omni-wikipedia" nil t)
+  ;(autoload-if-found '(consult-omni-embark) "consult-omni-embark" nil t)
+  ;(autoload-if-found '(consult-omni-brave-autosuggest) "consult-omni-brave-autosuggest" nil t)
+  ;(setq consult-omni-default-interactive-command #'consult-omni-brave-autosuggest)
+  ;(consult-omni-sources-load-modules)
+;; (consult-omni-define-source "Brave"
+;;                             :narrow-char ?b
+;;                             :type 'dynamic
+;;                             :require-match t
+;;                             :face 'consult-omni-engine-title-face
+;;                             :request #'consult-omni--brave-fetch-results
+;;                             :preview-key consult-omni-preview-key
+;;                             :search-hist 'consult-omni--search-history
+;;                             :select-hist 'consult-omni--selection-history
+;;                             :enabled (lambda () (bound-and-true-p consult-omni-brave-api-key))
+;;                             :group #'consult-omni--group-function
+;;                             :sort t
+;;                             :static 'both)
+  
+)
+
 
 
 
