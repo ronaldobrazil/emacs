@@ -843,9 +843,10 @@ properly disable mozc-mode."
   (add-to-list 'load-path (locate-user-emacs-file "el-clone/swiper"))
 
   (autoload-if-found '(swiper-isearch) "swiper" nil t)
+  (autoload-if-found '(swiper-thing-at-point) "swiper" nil t)
   (autoload-if-found '(swiper-migemo) "swiper" nil t)
   (autoload-if-found '(swiper) "swiper" nil t)
-)
+  (autoload-if-found '(swiper-migemo-or-region) "swiper" nil t)
 
 (defun swiper-migemo()
 (interactive)
@@ -855,6 +856,7 @@ properly disable mozc-mode."
         swiper-isearch
         counsel-recentf
         counsel-rg))
+
 (setq migemo-options '("--quiet" "--nonewline" "--emacs"))
 (migemo-kill) ; migemoシャットダウン
 (migemo-init) ; migemo再起動
@@ -862,6 +864,28 @@ properly disable mozc-mode."
 (swiper-isearch)
 )
 
+; https://qiita.com/minoruGH/items/20d7664a3a57c7365ebc
+;; (defun my:ivy-migemo-re-builder (str)
+;;   "Own function for my:ivy-migemo."
+;;   (let* ((sep " \\|\\^\\|\\.\\|\\*")
+;;          (splitted (--map (s-join "" it)
+;; 		(--partition-by (s-matches-p " \\|\\^\\|\\.\\|\\*" it)
+;; 		  (s-split "" str t)))))
+;; 	(s-join "" (--map (cond ((s-equals? it " ") ".*?")
+;; 	                        ((s-matches? sep it) it)
+;; 				(t (migemo-get-pattern it)))
+;; 				  splitted))))
+;; (setq ivy-re-builders-alist '((t . ivy--regex-plus)
+;;   (swiper . my:ivy-migemo-re-builder)))
+
+;; (defun swiper-migemo-or-region ()
+;;    "If region is selected, `swiper-thing-at-point' with the keyword selected in region.
+;; If the region isn't selected, `swiper' with migemo."
+;;    (interactive)
+;;    (if (not (use-region-p))   
+;; 	 (swiper-migemo)
+;;      (swiper-thing-at-point)))
+)
 
 ;.6. Completion
 ;.6.1. corfu
@@ -1262,6 +1286,23 @@ properly disable mozc-mode."
   (autoload-if-found '(consult-imenu consult-imenu-multi) "consult-imenu" nil t)
   (autoload-if-found '(consult-kmacro) "consult-kmacro" nil t)
   (autoload-if-found '(consult-xref) "consult-xref" nil t)
+
+  ; consult-focus-line with line number
+  (defvar consult-focus-lines--original-display-line-numbers-mode nil
+    "Original state of `display-line-numbers-mode` before focusing lines.")
+  (defun consult-focus-lines--with-line-numbers (orig-fun &rest args)
+    "Around advice for `consult-focus-lines' to manage `display-line-numbers-mode'."
+    (let ((had-line-numbers (bound-and-true-p display-line-numbers-mode)))
+      (if (null consult--focus-lines-overlays)
+          (setq consult-focus-lines--original-display-line-numbers-mode
+                had-line-numbers))
+      (display-line-numbers-mode 1)
+      (unwind-protect
+          (apply orig-fun args)
+        (or consult--focus-lines-overlays
+            consult-focus-lines--original-display-line-numbers-mode
+            (display-line-numbers-mode -1)))))
+  (advice-add 'consult-focus-lines :around #'consult-focus-lines--with-line-numbers)
 
   ;; keybind
   ;; C-c bindings in `mode-specific-map'
@@ -2110,6 +2151,16 @@ properly disable mozc-mode."
     (global-set-key (kbd "C-S-k")  'puni-backward-kill-line)
     (setq puni-confirm-when-delete-unbalanced-active-region nil)
     (add-hook hook #'puni-mode)))
+
+
+;https://ama-ch.hatenablog.com/entry/20090114/1231918903
+;; カーソル位置から行頭まで削除する
+(defun backward-kill-line (arg)
+  "Kill chars backward until encountering the end of a line."
+  (interactive "p")
+  (kill-line 0))
+;; C-S-kに設定
+(global-set-key (kbd "C-S-k") 'backward-kill-line)
 
 
 ; visual regexp 置換
@@ -3509,11 +3560,15 @@ The DWIM behaviour of this command is as follows:
 (define-key global-map (kbd "C-c r") 'vr/replace)
 (define-key global-map (kbd "C-c q") 'vr/query-replace)
 
-(global-set-key (kbd "C-s") #'swiper) ;; バッファ検索
+(global-set-key (kbd "C-s") #'swiper-migemo) ;; バッファ検索
+(global-set-key (kbd "C-S-s") #'swiper-thing-at-point) ;; バッファ検索
+
+(global-set-key (kbd "M-s") #'consult-line-multi) ;; 複数バッファ串刺し検索
 ;(global-set-key (kbd "C-s") #'consult-line) ;; バッファ検索
-(global-set-key (kbd "C-S-s") #'consult-line-multi) ;; 複数バッファ串刺し検索
+;(global-set-key (kbd "C-s") #'swiper-migemo-or-region) ;; migemo search region or at-point
 ;(global-set-key (kbd "C-M-s") #'consult-line-migemo) ;; migemo search
-(global-set-key (kbd "C-M-s") #'swiper-migemo) ;; migemo search
+;(global-set-key (kbd "C-M-s") #'swiper-migemo) ;; migemo search
+
 (global-set-key (kbd "C-x C-p") #'switch-to-prev-buffer)
 (global-set-key (kbd "C-x C-n") #'switch-to-next-buffer)
 
