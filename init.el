@@ -3414,6 +3414,9 @@ This needs more work, to handle headings with lots of spaces in them."
       keypression-cast-command-name-format "%s  %s"
       keypression-combine-same-keystrokes t
       keypression-font-face-attribute '(:width normal :height 200 :weight bold))
+
+   (add-hook 'prog-mode-hook #'keypression-mode)
+   (add-hook 'org-mode-hook #'keypression-mode)
    )
 
 
@@ -3746,6 +3749,7 @@ The DWIM behaviour of this command is as follows:
 (require 'affe)
 (setq completion-auto-help nil)
 (my/yasnippet-capf-h)
+
 (global-corfu-mode)
 (setq corfu-auto t)
 (setq corfu-auto-delay 0.2)
