@@ -1398,7 +1398,6 @@ properly disable mozc-mode."
   (require 'consult-omni-ripgrep)
   (require 'consult-omni-wikipedia)
   (require 'consult-omni-duckduckgo)
-  ;(require 'consult-omni-brave)
   ;(require 'consult-omni-brave-autosuggest)
   ;;; Set your shorthand favorite interactive command
   ;(setq consult-omni-default-interactive-command #'consult-omni-brave-autosuggest) 
@@ -1410,13 +1409,6 @@ properly disable mozc-mode."
   (setq consult-omni-dynamic-input-debounce 1.0)
   (setq consult-omni-dynamic-refresh-delay consult-omni-dynamic-input-debounce)
   (setq consult-omni-default-interactive-command #'consult-omni-multi)
-  ;(setq consult-omni-multi-sources '(consult-omni--source-google))
-  ;(autoload-if-found '(consult-omni-multi) "consult-omni" nil t)
-  ;(autoload-if-found '(consult-omni-multi-static) "consult-omni" nil t)
-  ;(autoload-if-found '(consult-omni-sources) "consult-omni-sources" nil t)
-  ;(autoload-if-found '(consult-omni-sources-load-modules) "consult-omni-sources" nil t)
-  ;(autoload-if-found '(consult-omni-wikipedia) "consult-omni-wikipedia" nil t)
-  ;(autoload-if-found '(consult-omni-embark) "consult-omni-embark" nil t)
   ;(autoload-if-found '(consult-omni-brave-autosuggest) "consult-omni-brave-autosuggest" nil t)
   ;(setq consult-omni-default-interactive-command #'consult-omni-brave-autosuggest)
   ;(consult-omni-sources-load-modules)
@@ -1593,17 +1585,16 @@ properly disable mozc-mode."
   )
 
 
+; https://github.com/ZenScriptor/avy-flash ... 非同期で早いmigemo migemo 対応されたら検討.
+;; (eval-when-compile
+;;   (el-clone :repo "ZenScriptor/avy-flash"))
 
-; https://github.com/ZenScriptor/avy-flash 
-(eval-when-compile
-  (el-clone :repo "ZenScriptor/avy-flash"))
-
-(with-delayed-execution
-  (message "Install avy-flash...")
-  (add-to-list 'load-path (locate-user-emacs-file "el-clone/avy-flash"))
-  (autoload-if-found '(avy-flash-jump) "avy-flash" nil t)
-  (global-set-key (kbd "C-M-;") 'avy-flash-jump)
-)
+;; (with-delayed-execution
+;;   (message "Install avy-flash...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/avy-flash"))
+;;   (autoload-if-found '(avy-flash-jump) "avy-flash" nil t)
+;;   (global-set-key (kbd "C-M-;") 'avy-flash-jump)
+;; )
 
 
 
