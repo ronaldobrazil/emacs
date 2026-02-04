@@ -76,6 +76,8 @@
 ;.17. vc-follow-symlinks
 (setq vc-follow-symlinks t)
 
+; Emacs Version >= 26 fast.
+(setq global-display-line-numbers-mode 1)
 
 ;; Set part of theme at startup
 (custom-set-faces

@@ -3455,6 +3455,8 @@ This needs more work, to handle headings with lots of spaces in them."
    (add-to-list 'load-path (locate-user-emacs-file "el-clone/keycast"))
    (autoload-if-found '(keycast-mode-line-mode) "keycast" nil t)
    (autoload-if-found '(keycast-log-mode) "keycast" nil t)
+   (add-hook 'prog-mode-hook #'keycast-mode-line-mode)
+   (add-hook 'org-mode-hook #'keycast-mode-line-mode)
    )
 
 
@@ -3473,8 +3475,6 @@ This needs more work, to handle headings with lots of spaces in them."
       keypression-combine-same-keystrokes t
       keypression-font-face-attribute '(:width normal :height 200 :weight bold))
 
-   (add-hook 'prog-mode-hook #'keypression-mode)
-   (add-hook 'org-mode-hook #'keypression-mode)
    )
 
 
