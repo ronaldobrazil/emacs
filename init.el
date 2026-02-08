@@ -1379,56 +1379,56 @@ properly disable mozc-mode."
 
 
 ; https://github.com/armindarvish/consult-omni
-(eval-when-compile
-  (el-clone :repo "armindarvish/consult-omni"))
+;; (eval-when-compile
+;;   (el-clone :repo "armindarvish/consult-omni"))
 
-(with-delayed-execution
-  (message "Install consult-omni...")
-  (add-to-list 'load-path (locate-user-emacs-file "el-clone/consult-omni"))
-  (add-to-list 'load-path (locate-user-emacs-file "el-clone/consult-omni/sources"))
-  (autoload-if-found '(consult-omni) "consult-omni" nil t)
-  (autoload-if-found '(consult-omni-multi) "consult-omni" nil t)
-  (autoload-if-found '(consult-omni-fd) "consult-omni" nil t)
-  (autoload-if-found '(consult-omni-grep) "consult-omni" nil t)
-  (autoload-if-found '(consult-omni-ripgrep) "consult-omni" nil t)
-  (autoload-if-found '(consult-omni-wikipedia) "consult-omni" nil t)
-  (autoload-if-found '(consult-omni-duckduckgo-api) "consult-omni" nil t)
-  (require 'consult-omni-sources)
-  (require 'consult-omni-embark)
-  (require 'consult-omni-fd)
-  (require 'consult-omni-grep)
-  (require 'consult-omni-ripgrep)
-  (require 'consult-omni-wikipedia)
-  (require 'consult-omni-duckduckgo)
-  ;(require 'consult-omni-brave-autosuggest)
-  ;;; Set your shorthand favorite interactive command
-  ;(setq consult-omni-default-interactive-command #'consult-omni-brave-autosuggest) 
+;; (with-delayed-execution
+;;   (message "Install consult-omni...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/consult-omni"))
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/consult-omni/sources"))
+;;   (autoload-if-found '(consult-omni) "consult-omni" nil t)
+;;   (autoload-if-found '(consult-omni-multi) "consult-omni" nil t)
+;;   (autoload-if-found '(consult-omni-fd) "consult-omni" nil t)
+;;   (autoload-if-found '(consult-omni-grep) "consult-omni" nil t)
+;;   (autoload-if-found '(consult-omni-ripgrep) "consult-omni" nil t)
+;;   (autoload-if-found '(consult-omni-wikipedia) "consult-omni" nil t)
+;;   (autoload-if-found '(consult-omni-duckduckgo-api) "consult-omni" nil t)
+;;   (require 'consult-omni-sources)
+;;   (require 'consult-omni-embark)
+;;   (require 'consult-omni-fd)
+;;   (require 'consult-omni-grep)
+;;   (require 'consult-omni-ripgrep)
+;;   (require 'consult-omni-wikipedia)
+;;   (require 'consult-omni-duckduckgo)
+;;   ;(require 'consult-omni-brave-autosuggest)
+;;   ;;; Set your shorthand favorite interactive command
+;;   ;(setq consult-omni-default-interactive-command #'consult-omni-brave-autosuggest) 
 
-  (setq consult-omni-show-preview t)
-  (setq browse-url-browser-function 'eww-browse-url)
-  (setq consult-omni-sources-modules-to-load (list 'consult-omni-fd 'consult-omni-grep 'consult-omni-ripgrep 'consult-omni-wikipedia 'consult-omni-duckduckgo))
-  (consult-omni-sources-load-modules)
-  (setq consult-omni-dynamic-input-debounce 1.0)
-  (setq consult-omni-dynamic-refresh-delay consult-omni-dynamic-input-debounce)
-  (setq consult-omni-default-interactive-command #'consult-omni-multi)
-  ;(autoload-if-found '(consult-omni-brave-autosuggest) "consult-omni-brave-autosuggest" nil t)
-  ;(setq consult-omni-default-interactive-command #'consult-omni-brave-autosuggest)
-  ;(consult-omni-sources-load-modules)
-;; (consult-omni-define-source "Brave"
-;;                             :narrow-char ?b
-;;                             :type 'dynamic
-;;                             :require-match t
-;;                             :face 'consult-omni-engine-title-face
-;;                             :request #'consult-omni--brave-fetch-results
-;;                             :preview-key consult-omni-preview-key
-;;                             :search-hist 'consult-omni--search-history
-;;                             :select-hist 'consult-omni--selection-history
-;;                             :enabled (lambda () (bound-and-true-p consult-omni-brave-api-key))
-;;                             :group #'consult-omni--group-function
-;;                             :sort t
-;;                             :static 'both)
+;;   (setq consult-omni-show-preview t)
+;;   (setq browse-url-browser-function 'eww-browse-url)
+;;   (setq consult-omni-sources-modules-to-load (list 'consult-omni-fd 'consult-omni-grep 'consult-omni-ripgrep 'consult-omni-wikipedia 'consult-omni-duckduckgo))
+;;   (consult-omni-sources-load-modules)
+;;   (setq consult-omni-dynamic-input-debounce 1.0)
+;;   (setq consult-omni-dynamic-refresh-delay consult-omni-dynamic-input-debounce)
+;;   (setq consult-omni-default-interactive-command #'consult-omni-multi)
+;;   ;(autoload-if-found '(consult-omni-brave-autosuggest) "consult-omni-brave-autosuggest" nil t)
+;;   ;(setq consult-omni-default-interactive-command #'consult-omni-brave-autosuggest)
+;;   ;(consult-omni-sources-load-modules)
+;; ;; (consult-omni-define-source "Brave"
+;; ;;                             :narrow-char ?b
+;; ;;                             :type 'dynamic
+;; ;;                             :require-match t
+;; ;;                             :face 'consult-omni-engine-title-face
+;; ;;                             :request #'consult-omni--brave-fetch-results
+;; ;;                             :preview-key consult-omni-preview-key
+;; ;;                             :search-hist 'consult-omni--search-history
+;; ;;                             :select-hist 'consult-omni--selection-history
+;; ;;                             :enabled (lambda () (bound-and-true-p consult-omni-brave-api-key))
+;; ;;                             :group #'consult-omni--group-function
+;; ;;                             :sort t
+;; ;;                             :static 'both)
   
-)
+;; )
 
 
 
@@ -3753,7 +3753,44 @@ The DWIM behaviour of this command is as follows:
    ;(require 'lsp-clients)
    ;; clangdへのパスを指定(通常は自動認識)
    (setq lsp-clients-clangd-executable "/usr/bin/clangd")
-   ;; c++-modeでclangdを有効化
+   
+   (setq lsp-headerline-breadcrumb-enable nil)
+   (setq lsp-enable-file-watchers nil)
+   (setq lsp-enable-folding nil)
+   (setq lsp-enable-symbol-highlighting nil)
+   (setq lsp-enable-text-document-color nil)
+   (setq lsp-enable-indentation nil)
+   (setq lsp-enable-on-type-formatting nil)
+   (setq lsp-auto-execute-action nil)
+   (setq lsp-before-save-edits nil)
+
+   (setq lsp-ui-doc-enable t)
+   (setq lsp-ui-doc-header t)
+   (setq lsp-ui-doc-include-signature t)
+   (setq lsp-ui-doc-position 'top) ;; top, bottom, or at-point
+   (setq lsp-ui-doc-max-width 150)
+   (setq lsp-ui-doc-max-height 30)
+   (setq lsp-ui-doc-use-childframe t)
+   (setq lsp-ui-doc-use-webkit t)
+   ;; lsp-ui-flycheck
+   (setq lsp-ui-flycheck-enable nil)
+   ;; lsp-ui-sideline
+   (setq lsp-ui-sideline-enable nil)
+   (setq lsp-ui-sideline-ignore-duplicate t)
+   (setq lsp-ui-sideline-show-symbol t)
+   (setq lsp-ui-sideline-show-hover t)
+   (setq lsp-ui-sideline-show-diagnostics nil)
+   (setq lsp-ui-sideline-show-code-actions nil)
+   ;setq ; lsp-ui-imenu
+   (setq lsp-ui-imenu-enable nil)
+   (setq lsp-ui-imenu-kind-position 'top)
+   ;; lsp-ui-peek
+   (setq lsp-ui-peek-enable t)
+   (setq lsp-ui-peek-peek-height 20)
+   (setq lsp-ui-peek-list-width 50)
+   (setq lsp-ui-peek-fontify 'on-demand) ;; never, on-demand, or always
+
+;; c++-modeでclangdを有効化
    (add-hook 'c++-mode-hook 'lsp)
    (add-hook 'c++-mode-hook #'lsp-deferred)
    )
