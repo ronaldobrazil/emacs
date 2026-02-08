@@ -331,7 +331,9 @@
  '(goggles-pulse-delay 0.1)
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
- '(package-selected-packages '(solarized-theme spacemacs-theme zenburn-theme))
+ '(package-selected-packages
+   '(consult-lsp lsp-mode lsp-ui solarized-theme spacemacs-theme
+                 zenburn-theme))
  '(savehist-additional-variables '(kill-ring))
  '(warning-suppress-types '((comp))))
 
@@ -3208,44 +3210,60 @@ This needs more work, to handle headings with lots of spaces in them."
 )
 
 
-
-; ggtags
-(eval-when-compile
-  (el-clone :repo "leoliu/ggtags"))
-(with-delayed-execution
-  (message "Install ggtags...")
-  (add-to-list 'load-path (locate-user-emacs-file "el-clone/ggtags"))
-  (autoload-if-found '(ggtags-mode) "ggtags" nil t)
+;; ; ggtags
+;; (eval-when-compile
+;;   (el-clone :repo "leoliu/ggtags"))
+;; (with-delayed-execution
+;;   (message "Install ggtags...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/ggtags"))
+;;   (autoload-if-found '(ggtags-mode) "ggtags" nil t)
     
-  (add-hook 'c-mode-common-hook
-          (lambda ()
-            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'csharp-mode)
-              (ggtags-mode 1))))
-  ;(ggtags-mode 1)
-  ;(add-hook 'prog-mode-hook 'ggtags-mode)
-  (global-set-key (kbd"M-r") 'ggtags-find-reference)                        
-  )
+;;   (add-hook 'c-mode-common-hook
+;;           (lambda ()
+;;             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'csharp-mode)
+;;               (ggtags-mode 1))))
+;;   ;(ggtags-mode 1)
+;;   ;(add-hook 'prog-mode-hook 'ggtags-mode)
+;;   (global-set-key (kbd"M-r") 'ggtags-find-reference)                        
+;;   )
 
-; dump-jump
-(eval-when-compile
-  (el-clone :repo "jacktasia/dumb-jump"))
-(with-delayed-execution
-  (message "Install dumb-jump...")
-  (add-to-list 'load-path (locate-user-emacs-file "el-clone/dumb-jump"))
-  (autoload-if-found '(dumb-jump-mode) "dumb-jump" nil t)
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate) ;; xref使うらしい
-  (setq dumb-jump-force-searcher 'rg) ;; default git grepが使われてエラー
-  (setq dumb-jump-prefer-searcher 'rg) ;; rgコマンドを優先的に利用する
-  (setq dumb-jump-default-project "")  ;; $HOME以下が検索対象になるのを回避
-  (setq dumb-jump-disable-obsolete-warnings t) ;; レガシーコマンドの警告非表示
+;; ; dump-jump
+;; (eval-when-compile
+;;   (el-clone :repo "jacktasia/dumb-jump"))
+;; (with-delayed-execution
+;;   (message "Install dumb-jump...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/dumb-jump"))
+;;   (autoload-if-found '(dumb-jump-mode) "dumb-jump" nil t)
+;;   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate) ;; xref使うらしい
+;;   (setq dumb-jump-force-searcher 'rg) ;; default git grepが使われてエラー
+;;   (setq dumb-jump-prefer-searcher 'rg) ;; rgコマンドを優先的に利用する
+;;   (setq dumb-jump-default-project "")  ;; $HOME以下が検索対象になるのを回避
+;;   (setq dumb-jump-disable-obsolete-warnings t) ;; レガシーコマンドの警告非表示
 
-  (global-set-key (kbd "C-.") 'dumb-jump-go)
-  (global-set-key (kbd "C-,") 'dumb-jump-back)
-  (global-set-key (kbd "C-M-q") 'dumb-jump-quick-look)
+;;   (global-set-key (kbd "C-.") 'dumb-jump-go)
+;;   (global-set-key (kbd "C-,") 'dumb-jump-back)
+;;   (global-set-key (kbd "C-M-q") 'dumb-jump-quick-look)
 
-  (add-hook 'prog-mode-hook 'dumb-jump-mode)
-  (add-hook 'emacs-lisp-mode-hook 'dumb-jump-mode)
-  )
+;;   (add-hook 'prog-mode-hook 'dumb-jump-mode)
+;;   (add-hook 'emacs-lisp-mode-hook 'dumb-jump-mode)
+;;   )
+
+
+;; ; https://github.com/universal-ctags/citre
+;; (eval-when-compile
+;;   (el-clone :repo "universal-ctags/citre"))
+;; (with-delayed-execution
+;;   (message "Install citre...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/citre"))
+;;   (autoload-if-found '(citre-jump) "citre" nil t)
+;;   (require 'citre-config)
+;;   ;(autoload-if-found '(citre-jump) "citre-config" nil t)
+;; ;  (add-hook 'c-mode-hook 'citre-mode)
+;;   ;(add-hook 'c++-mode-hook 'citre-mode)
+;;   )
+
+
+
 
 ;https://github.com/bling/fzf.el
 (eval-when-compile
@@ -3672,6 +3690,308 @@ The DWIM behaviour of this command is as follows:
 
 (require 'rtags)
 (setq rtags-path "~/rtags/bin")
+
+
+;;;https://github.com/kiwanami/emacs-ctable
+;; (eval-when-compile
+;;   (el-clone :repo "kiwanami/emacs-ctable"))
+
+;; (with-delayed-execution
+;;   (message "Install ctable...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/emacs-ctable"))
+;;   (require 'ctable)
+;;   )
+
+
+;;;https://github.com/kchanqvq/xwwp does not work xwidget-live-p argument unmatch
+;; (eval-when-compile
+;;   (el-clone :repo "kchanqvq/xwwp"))
+
+;; (with-delayed-execution
+;;   (message "Install xwwp...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/xwwp"))
+
+;;   (autoload-if-found '(xwwp-follow-link xwwp-ace-toggle) "xwwp-full" nil t)
+;;   (setq xwwp-follow-link-completion-system 'ivy)
+;; )
+
+;; ; https://github.com/abo-abo/hydra
+;; (eval-when-compile
+;;    (el-clone :repo "abo-abo/hydra"))
+;;  (with-delayed-execution
+;;    (message "Install abo lv...")
+;;    (add-to-list 'load-path (locate-user-emacs-file "el-clone/hydra"))
+;;    (autoload-if-found '(lv) "lv" nil t))
+
+;; ; https://github.com/Malabarba/spinner.el
+;; (eval-when-compile
+;;    (el-clone :repo "Malabarba/spinner.el"))
+;;  (with-delayed-execution
+;;    (message "Install spinner...")
+;;    (add-to-list 'load-path (locate-user-emacs-file "el-clone/spinner"))
+;;    (autoload-if-found '(spinner) "spinner" nil t))
+
+;;  https://github.com/emacs-lsp/lsp-mode
+;;  need package-list MELPA install
+(require 'lsp-mode)
+;(eval-when-compile
+;   (el-clone :repo "emacs-lsp/lsp-mode"))
+ (with-delayed-execution
+;   (message "Install lsp-mode...")
+;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/lsp-mode"))
+   (autoload-if-found '(lsp lsp-deferred lsp-org lsp-register-client make-lsp-client) "lsp-mode" nil t)
+   
+   ;(autoload-if-found '(lsp-lens-mode lsp-lens-refresh lsp-lens--enable) "lsp-lens" nil t)
+   ;(autoload-if-found '(lsp-modeline-workspace-status-mode lsp-modeline-code-actions-mode) "lsp-modeline" nil t)
+   ;(autoload-if-found '(lsp-headerline-breadcrumb-mode) "lsp-headerline" nil t)
+   ;(autoload-if-found '(lsp-diagnostics-mode) "lsp-diagnostics" nil t)
+
+   ;(setq gc-cons-threshold 100000000)
+   (setq read-process-output-max (* 1024 1024))
+   (setq lsp-completion-provider :capf)
+   (setq lsp-idle-delay 0.500)
+   ;(require 'lsp-clients)
+   ;; clangdへのパスを指定(通常は自動認識)
+   (setq lsp-clients-clangd-executable "/usr/bin/clangd")
+   ;; c++-modeでclangdを有効化
+   (add-hook 'c++-mode-hook 'lsp)
+   (add-hook 'c++-mode-hook #'lsp-deferred)
+   )
+
+   
+;; (with-eval-after-load 'lsp-mode
+;;   (add-to-list 'lsp-language-id-configuration '(c++-mode . "cpp"))
+;;   ;; 必要に応じてc-modeも追加
+;;   (add-to-list 'lsp-language-id-configuration '(c-mode . "c")))
+
+
+;; ;; https://github.com/emacs-lsp/lsp-ui
+;; ;(require 'lsp-ui)
+;; (eval-when-compile
+;;    (el-clone :repo "emacs-lsp/lsp-ui"))
+;;  (with-delayed-execution
+;;    (message "Install lsp-ui...")
+;;    (add-to-list 'load-path (locate-user-emacs-file "el-clone/lsp-ui"))
+;;    (setq lsp-ui-imenu-enable t)
+;;    (setq lsp-headerline-breadcrumb-enable t)
+;;    (define-key lsp-mode-map (kbd "C-c C-r") #'lsp-ui-peek-find-references)
+;;    (define-key lsp-mode-map (kbd "C-c C-j") #'lsp-ui-peek-find-definitions)
+;;    (define-key lsp-mode-map (kbd "C-c C-i") #'lsp-ui-peek-find-implementation)
+;;    (define-key lsp-mode-map (kbd "C-c C-m") #'lsp-ui-imenu)
+;;    (define-key lsp-mode-map (kbd "C-c C-s") #'lsp-ui-sideline-mode)
+;;    (define-key lsp-mode-map (kbd "C-c C-d") #'lsp-ui-doc-mode)
+;;    )
+
+
+
+
+;;; 9.8.3. lsp-mode https://emacs.takeokunn.org/
+;; lsp-mode
+
+;; (autoload-if-found '(lsp lsp-deferred lsp-org lsp-register-client make-lsp-client) "lsp-mode" nil t)
+;; (autoload-if-found '(lsp-lens-mode lsp-lens-refresh lsp-lens--enable) "lsp-lens" nil t)
+;; (autoload-if-found '(lsp-modeline-workspace-status-mode lsp-modeline-code-actions-mode) "lsp-modeline" nil t)
+;; (autoload-if-found '(lsp-headerline-breadcrumb-mode) "lsp-headerline" nil t)
+;; (autoload-if-found '(lsp-diagnostics-mode) "lsp-diagnostics" nil t)
+;; (with-eval-after-load 'lsp-mode
+;;   (add-to-list 'lsp-language-id-configuration '("php-ts-mode" . "php"))
+
+;;   ;; advice
+;;   (advice-add 'lsp-rename :around #'my/advice-disable-buffer-readonly)
+;;   (advice-add 'lsp-execute-code-action :around #'my/advice-disable-buffer-readonly)
+
+;;   ;; ignore path
+;;   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]vendor")
+;;   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]storage")
+;;   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]docs")
+;;   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]target")
+;;   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].calva")
+;;   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].clj-kondo")
+;;   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].direnv")
+
+;;   ;; enable flycheck
+;;   (add-hook 'lsp-mode-hook #'flycheck-mode)
+
+;;   ;; enable diagnostics
+;;   (add-hook 'lsp-configure-hook #'lsp-diagnostics-mode)
+
+;;   ;; enable completion
+;;   (add-hook 'lsp-configure-hook #'corfu-mode)
+
+;;   ;; config
+;;   (setopt lsp-response-timeout 60)
+;;   (setopt lsp-idle-delay 0.8)
+;;   (setopt lsp-enable-links nil)
+;;   (setopt lsp-log-io nil)
+;;   (setopt lsp-file-watch-threshold 20000)
+;;   (setopt lsp-client-packages (delq 'lsp-volar lsp-client-packages))
+;;   (setopt lsp-modeline-code-actions-enable nil))
+
+;; (with-eval-after-load 'lsp-diagnostics
+;;   ;; config
+;;   (setopt lsp-diagnostics-flycheck-default-level 'warning))
+
+;; (with-eval-after-load 'lsp-completion
+;;   ;; config
+;;   (setopt lsp-completion-no-cache t)
+;;   (setopt lsp-completion-provider :none))
+
+;; (with-eval-after-load 'lsp-php
+;;   ;; for intelephense
+;;   (setopt lsp-intelephense-telemetry-enabled t)
+;;   (setopt lsp-intelephense-files-exclude ["**/.git/**" "**/.svn/**" "**/.hg/**" "**/CVS/**" "**/.DS_Store/**"
+;;                                           "**/node_modules/**" "**/bower_components/**" "**/vendor/**/{Test,test,Tests,tests}/**"
+;;                                           "**/.direnv/**"]))
+
+;; (with-eval-after-load 'lsp-javascript
+;;   ;; for tsgo (typescript-go)
+;;   (setopt lsp-typescript-references-code-lens-enabled t)
+;;   (setopt lsp-typescript-implementations-code-lens-enabled t)
+;;   (setopt lsp-javascript-display-return-type-hints t)
+;;   (setopt lsp-javascript-display-parameter-type-hints t)
+;;   (setopt lsp-javascript-display-parameter-name-hints-when-argument-matches-name t)
+;;   (setopt lsp-javascript-display-property-declaration-type-hints t)
+;;   (setopt lsp-javascript-display-variable-type-hints t)
+
+;;   ;; for deno
+;;   (setopt lsp-clients-deno-enable-unstable t))
+
+;; (with-eval-after-load 'lsp-ruby
+;;   ;; config
+;;   (setopt lsp-solargraph-autoformat t)
+;;   (setopt lsp-solargraph-multi-root nil))
+
+;; (with-eval-after-load 'lsp-nix
+;;   ;; use nixd instead of nil
+;;   (setopt lsp-disabled-clients '(nix-nil))
+;;   (setopt lsp-nix-nixd-server-path "nixd")
+;;   (setopt lsp-nix-nixd-formatting-command ["nixfmt-rfc-style"])
+;;   ;; nixd completion configuration
+;;   (let ((flake-path (concat "builtins.getFlake \""
+;;                             (string-trim (shell-command-to-string "ghq root"))
+;;                             "/github.com/takeokunn/nixos-configuration\"")))
+;;     (setopt lsp-nix-nixd-nixpkgs-expr
+;;             (format "import (%s).inputs.nixpkgs { }" flake-path))
+;;     (setopt lsp-nix-nixd-nixos-options-expr
+;;             (format "(%s).darwinConfigurations.Attm-M4-Max.options" flake-path))
+;;     (setopt lsp-nix-nixd-home-manager-options-expr
+;;             (format "(%s).darwinConfigurations.Attm-M4-Max.options.home-manager.users.type.getSubOptions []" flake-path))))
+
+;; (with-eval-after-load 'lsp-copilot
+;;   ;; config
+;;   (setopt lsp-copilot-enabled nil))
+;;; 9.8.4. kakehashi
+;; (with-eval-after-load 'lsp-mode
+;;   (lsp-register-client
+;;    (make-lsp-client
+;;     :new-connection (lsp-stdio-connection '("kakehashi"))
+;;     :activation-fn (lsp-activate-on "markdown")
+;;     :server-id 'kakehashi)))
+
+;;; 9.8.5. emacs-lsp-booster
+;;; https://github.com/blahgeek/emacs-lsp-booster
+;;https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-mode
+
+;; (defun lsp-booster--advice-json-parse (old-fn &rest args)
+;;   "Try to parse bytecode instead of json."
+;;   (or
+;;    (when (equal (following-char) ?#)
+;;      (let ((bytecode (read (current-buffer))))
+;;        (when (byte-code-function-p bytecode)
+;;          (funcall bytecode))))
+;;    (apply old-fn args)))
+
+;; (advice-add (if (progn (require 'json)
+;;                        (fboundp 'json-parse-buffer))
+;;                 'json-parse-buffer
+;;               'json-read)
+;;             :around
+;;             #'lsp-booster--advice-json-parse)
+
+;; (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+;;   "Prepend emacs-lsp-booster command to lsp CMD."
+;;   (let ((orig-result (funcall old-fn cmd test?)))
+;;     (if (and (not test?)                             ;; for check lsp-server-present?
+;;              (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+;;              lsp-use-plists
+;;              (not (functionp 'json-rpc-connection))  ;; native json-rpc
+;;              (executable-find "emacs-lsp-booster"))
+;;         (progn
+;;           (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+;;             (setcar orig-result command-from-exec-path))
+;;           (message "Using emacs-lsp-booster for %s!" orig-result)
+;;           (cons "emacs-lsp-booster" orig-result))
+;;       orig-result)))
+
+;; (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+
+;;;9.8.6. emacs-ccslls
+;; (with-eval-after-load 'lsp-mode
+;;   (add-hook 'lsp-mode-hook #'(lambda () (require 'ccls))))
+
+;; 9.8.7. lsp-php-key
+;; (with-eval-after-load 'lsp-php
+;;   (setopt lsp-intelephense-licence-key "00OXTX8OROOJH9P"))
+;; 9.8.8. consult-lsp
+;; (autoload-if-found '(consult-lsp-symbols) "consult-lsp" nil t)
+
+;; (with-eval-after-load 'lsp-mode
+;;   (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols))
+
+
+
+;;  need package-list MELPA install
+(require 'lsp-ui)
+;; (autoload-if-found '(lsp-ui-mode) "lsp-ui" nil t)
+
+;; hook
+(with-eval-after-load 'lsp-mode
+  ;; hooks
+  (add-hook 'lsp-mode-hook #'lsp-ui-mode))
+
+
+;; ;; lsp-ui-doc
+;; (with-eval-after-load 'lsp-ui-doc
+;;   ;; config
+;;   (setopt lsp-ui-doc-enable t)
+;;   (setopt lsp-ui-doc-show-with-cursor t)
+;;   (setopt lsp-ui-doc-use-webkit t)
+;;   (setopt lsp-ui-doc-include-signature t)
+;;   (setopt lsp-ui-doc-delay 1)
+;;   (setopt lsp-ui-doc-max-height 30))
+
+;; lsp-ui-peek
+(autoload-if-found '(lsp-ui-peek-find-references lsp-ui-peek-find-definitions lsp-ui-peek-find-implementation) "lsp-ui-peek" nil t)
+(with-eval-after-load 'lsp-ui-peek
+  ;; config
+  (setopt lsp-ui-peek-enable nil)
+  (setopt lsp-ui-peek-peek-height 30)
+  (setopt lsp-ui-peek-list-width 60)
+  (setopt lsp-ui-peek-fontify 'on-demand))
+
+;; lsp-ui-imenu
+(autoload-if-found '(lsp-ui-imenu) "lsp-ui-imenu" nil t)
+(with-eval-after-load 'lsp-ui-imenu
+  ;; config
+  (setopt lsp-ui-imenu-enable nil)
+  (setopt lsp-ui-imenu-kind-position 'top))
+
+;; lsp-ui-sideline
+(autoload-if-found '(lsp-ui-sideline-mode) "lsp-ui-sideline" nil t)
+(with-eval-after-load 'lsp-ui-sideline
+  ;; config
+  (setopt lsp-ui-sideline-enable nil)
+  (setopt lsp-ui-sideline-show-hover t))
+
+;; ;; keybind
+;; (with-eval-after-load 'lsp-mode
+;;   ;; hooks
+;;   (define-key lsp-mode-map (kbd "C-c C-r") #'lsp-ui-peek-find-references)
+;;   (define-key lsp-mode-map (kbd "C-c C-j") #'lsp-ui-peek-find-definitions)
+;;   (define-key lsp-mode-map (kbd "C-c C-i") #'lsp-ui-peek-find-implementation)
+;;   (define-key lsp-mode-map (kbd "C-c C-m") #'lsp-ui-imenu)
+;;   (define-key lsp-mode-map (kbd "C-c C-s") #'lsp-ui-sideline-mode)
+;;   (define-key lsp-mode-map (kbd "C-c C-d") #'lsp-ui-doc-mode))
 
 
 ;6.1. byte-compileする
