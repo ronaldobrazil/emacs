@@ -2225,6 +2225,19 @@ properly disable mozc-mode."
     (global-set-key (kbd "C-k")  'puni-kill-line)
     (global-set-key (kbd "C-S-k")  'puni-backward-kill-line)
     (setq puni-confirm-when-delete-unbalanced-active-region nil)
+
+    ; https://qiita.com/kizashi1122/items/7028aa19f51823b69277
+    ; kill-ring に入れない削除は、M-S-BS
+    (defun delete-word (arg)
+      "Delete characters forward until encountering the end of a word. With argument, do this that many times."
+      (interactive "p")
+      (delete-region (point) (progn (forward-word arg) (point))))
+    (defun backward-delete-word (arg)
+  "Delete characters backward until encountering the end of a word.With argument, do this that many times."
+    (interactive "p")
+    (delete-word (- arg)))
+    (global-set-key (kbd "C-M-d")  'backward-delete-word)
+
     (add-hook hook #'puni-mode)))
 
 
