@@ -32,8 +32,10 @@
 ;(setq gc-cons-threshold (* 128 1024 1024))
 ;(setq garbage-collection-messages nil)
 
-;.8. read-process
+; 不要なりサイズを抑制
+(setq frame-inhibit-implied-resize t)
 
+;.8. read-process
 (setq read-process-output-max (* 8 1024 1024))
 
 ;.9. indent
