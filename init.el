@@ -332,8 +332,7 @@
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
  '(package-selected-packages
-   '(consult-lsp lsp-mode lsp-ui solarized-theme spacemacs-theme
-                 zenburn-theme))
+   '(consult-lsp lsp-mode lsp-ui solarized-theme spacemacs-theme zenburn-theme))
  '(savehist-additional-variables '(kill-ring))
  '(warning-suppress-types '((comp))))
 
@@ -347,6 +346,14 @@
 
 (with-current-buffer "*Messages*"
   (emacs-lock-mode 'kill))
+
+; 編集機能設定
+(require 'simple)
+           (setq kill-read-only-ok t)
+           (setq kill-whole-line t)
+           (setq eval-expression-print-length nil)
+           (setq eval-expression-print-level nil)
+
 
 ;; scratch バッファの内容をファイルに書き出して保持する
 (defun save-scratch-data ()
@@ -3501,8 +3508,8 @@ This needs more work, to handle headings with lots of spaces in them."
    (add-to-list 'load-path (locate-user-emacs-file "el-clone/keycast"))
    (autoload-if-found '(keycast-mode-line-mode) "keycast" nil t)
    (autoload-if-found '(keycast-log-mode) "keycast" nil t)
-   (add-hook 'prog-mode-hook #'keycast-mode-line-mode)
-   (add-hook 'org-mode-hook #'keycast-mode-line-mode)
+   ;(add-hook 'prog-mode-hook #'keycast-mode-line-mode)
+   ;(add-hook 'org-mode-hook #'keycast-mode-line-mode)
    )
 
 
@@ -4058,5 +4065,8 @@ The DWIM behaviour of this command is as follows:
  '(goggles-removed ((t (:background "#fabfbb"))))
  '(org-done ((t (:foreground "PaleGreen" :weight normal :strike-through t))))
  '(org-headline-done ((((class color) (min-colors 16) (background dark)) (:foreground "LightSalmon" :strike-through t)))))
+
+(set-face-attribute 'mode-line nil :background "OliveDrab1" :foreground "gray25" :inherit 'bold)
+(set-face-attribute 'mode-line-inactive nil :background "#555555" :foreground "#dddddd")
 
 (message "init.el end.")
