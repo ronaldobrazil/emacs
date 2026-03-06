@@ -231,7 +231,14 @@
 
 ;.3. C-kで行削除
 (with-eval-after-load 'simple
-  (setq kill-whole-line t))
+  (setq kill-whole-line t)
+
+; 編集機能設定
+  (setq kill-read-only-ok t)
+  (setq kill-whole-line t)
+  (setq eval-expression-print-length nil)
+  (setq eval-expression-print-level nil)
+)
 
 ;.4. カッコの中をハイライトする
 (with-delayed-execution
@@ -346,13 +353,6 @@
 
 (with-current-buffer "*Messages*"
   (emacs-lock-mode 'kill))
-
-; 編集機能設定
-(require 'simple)
-           (setq kill-read-only-ok t)
-           (setq kill-whole-line t)
-           (setq eval-expression-print-length nil)
-           (setq eval-expression-print-level nil)
 
 
 ;; scratch バッファの内容をファイルに書き出して保持する
