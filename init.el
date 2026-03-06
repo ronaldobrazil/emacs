@@ -1333,6 +1333,21 @@ properly disable mozc-mode."
             (display-line-numbers-mode -1)))))
   (advice-add 'consult-focus-lines :around #'consult-focus-lines--with-line-numbers)
 
+  ;; consult-ripgrep をカレントディレクトリのみを対象として実行
+  (defun consult-ripgrep-current-directory ()
+  (interactive)
+  (consult-ripgrep default-directory))
+
+  ;; consult-grep をカレントディレクトリのみを対象として実行
+  (defun consult-grep-current-directory ()
+  (interactive)
+  (consult-grep default-directory))
+
+  ;; M-s R でカレントディレクトリ ripgrep
+  ;(define-key search-map (kbd "R") #'consult-ripgrep-current-directory)
+  ;; M-s M-g でカレントディレクトリ grep (元の M-s g はプロジェクト全体 grep)
+  ;(define-key search-map (kbd "M-g") #'consult-grep-current-directory)
+
   ;; keybind
   ;; C-c bindings in `mode-specific-map'
   (global-set-key (kbd "C-c M-x") #'consult-mode-command)
@@ -1343,7 +1358,8 @@ properly disable mozc-mode."
   (global-set-key (kbd "C-x b")   #'consult-buffer)
   (global-set-key (kbd "C-x 4 b") #'consult-buffer-other-window)
   (global-set-key (kbd "C-x 5 b") #'consult-buffer-other-frame)
-  (global-set-key (kbd "C-x C-g") #'consult-ripgrep)
+  ;(global-set-key (kbd "C-x C-g") #'consult-ripgrep)
+  (global-set-key (kbd "C-x C-g") #'consult-ripgrep-current-directory )
 
   ;; Other custom bindings
   (global-set-key (kbd "M-y") #'consult-yank-pop)
