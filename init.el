@@ -391,95 +391,187 @@
   (setq display-time-day-and-date t))
 
 
-;; (add-to-list 'load-path "~/.emacs.d/lisp/ddskk-16.2")
-;; ;(require 'skk-autoloads)
-;; (require 'skk)
-;; (require 'skk-cus)
-;; (require 'skk-cursor)
-;; (require 'skk-tankan)
-;; (require 'skk-cdb)
-;; (global-set-key "\C-x\C-j" 'skk-mode)
-;; (global-set-key "\C-xj" 'skk-auto-fill-mode)
-;; (global-set-key "\C-xt" 'skk-tutorial)
+(add-to-list 'load-path "~/.emacs.d/lisp/ddskk-16.2")
+;(require 'skk-autoloads)
+(require 'skk)
+(require 'skk-cus)
+(require 'skk-cursor)
+(require 'skk-tankan)
+(require 'skk-cdb)
+(require 'skk-annotation)
 
-;; (setq skk-user-directory "~/.emacs.d/ddskk-16.2")
-;; ;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO.L")
-;; (setq skk-cdb-large-jisyo "/usr/share/skk/SKK-JISYO.L.cdb")
-;; ;(setq skk-large-jisyo "~/.emacs.d/skk/SKK-JISYO.L")
-;; ;(setq skk-server-host "localhost")
-;; ;(setq skk-server-portnum 1178)
-;; ;(global-set-key (kbd "C-x C-j") 'skk-mode)
-;; ;(set-input-method "japanese-skk")
-;; ;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO")
-;; ;(toggle-input-method nil)
+(global-set-key "\C-x\C-j" 'skk-mode)
+(global-set-key "\C-xj" 'skk-auto-fill-mode)
+(global-set-key "\C-xt" 'skk-tutorial)
 
-;; ;; ddskk
-;; ;; 「カタカナ/ひらがな」キーで SKK を起動する
-;; ;(global-set-key [hiragana-katakana] 'skk-mode)
+(setq skk-user-directory "~/.emacs.d/ddskk-16.2")
+;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO.L")
+(setq skk-cdb-large-jisyo "/usr/share/skk/SKK-JISYO.L.cdb")
+(setq skk-auto-okuri-process t)
+(setq skk-jisyo-code 'utf-8)
+;; 候補表示
+;; (setq skk-show-inline t)						  ; 変換候補の表示位置
+;; (setq skk-show-tooltip t)						  ; 変換候補の表示位置
+(setq skk-show-candidates-always-pop-to-buffer t) ; 変換候補の表示位置
+(setq skk-henkan-show-candidates-rows 2) ; 候補表示件数を2列に
 
-;; ;; ~/.skk にいっぱい設定を書いているのでバイトコンパイルしたい
-;; ;(setq skk-byte-compile-init-file t)
-;; ;; 注) 異なる種類の Emacsen を使っている場合は nil にします
+;; 動的候補表示
+(setq skk-dcomp-activate t)			 ; 動的補完
+(setq skk-dcomp-multiple-activate t) ; 動的補完の複数候補表示
+(setq skk-dcomp-multiple-rows 10)	 ; 動的補完の候補表示件数
+;; 動的補完の複数表示群のフェイス
+;(set-face-foreground 'skk-dcomp-multiple-face "Black")
+;(set-face-background 'skk-dcomp-multiple-face "LightGoldenrodYellow")
+(set-face-bold-p 'skk-dcomp-multiple-face nil)
+;; 動的補完の複数表示郡の補完部分のフェイス
+(set-face-foreground 'skk-dcomp-multiple-trailing-face "dim gray")
+(set-face-bold-p 'skk-dcomp-multiple-trailing-face nil)
+;; 動的補完の複数表示郡の選択対象のフェイス
+(set-face-foreground 'skk-dcomp-multiple-selected-face "White")
+(set-face-background 'skk-dcomp-multiple-selected-face "LightGoldenrod4")
+(set-face-bold-p 'skk-dcomp-multiple-selected-face nil)
+;; 動的補完時に下で次の補完へ
+(define-key skk-j-mode-map (kbd "<down>") 'skk-completion-wrapper)
 
-;; ;; SKK を Emacs の input method として使用する
-;; ;;   `toggle-input-method' (C-\) で DDSKK が起動します
-;; ;(setq default-input-method
-;; ;      "japanese-skk"			; (skk-mode 1)
-;; ;;;    "japanese-skk-auto-fill"		; (skk-auto-fill-mode 1)
-;; ;      )
+;; 動作
+(setq skk-egg-like-newline t)		  ; Enterで改行しない
+(setq skk-delete-implies-kakutei nil) ; ▼モードで一つ前の候補を表示
+(setq skk-show-annotation t)		  ; Annotation
+(setq skk-annotation-show-wikipedia-url t) ; Annotation で Wikipedia を
+(setq skk-use-look t)					   ; 英語補完
+(setq skk-auto-insert-paren nil)		   ; 閉じカッコを自動的に
+(setq skk-henkan-strict-okuri-precedence t) ; 送り仮名が厳密に正しい候補を優先して表示
 
-;; ;; SKK を起動していなくても、いつでも skk-isearch を使う
-;; ;(setq skk-isearch-mode-enable 'always)
+;(setq skk-large-jisyo "~/.emacs.d/skk/SKK-JISYO.L")
+;(setq skk-server-host "localhost")
+;(setq skk-server-portnum 1178)
+;(global-set-key (kbd "C-x C-j") 'skk-mode)
+;(set-input-method "japanese-skk")
+;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO")
+;(toggle-input-method nil)
+
+;; ddskk
+;; 「カタカナ/ひらがな」キーで SKK を起動する
+;(global-set-key [hiragana-katakana] 'skk-mode)
+
+;; ~/.skk にいっぱい設定を書いているのでバイトコンパイルしたい
+;(setq skk-byte-compile-init-file t)
+;; 注) 異なる種類の Emacsen を使っている場合は nil にします
+
+;; SKK を Emacs の input method として使用する
+;;   `toggle-input-method' (C-\) で DDSKK が起動します
+(setq default-input-method
+;      "japanese-skk"			; (skk-mode 1)
+    "japanese-skk-auto-fill"		; (skk-auto-fill-mode 1)
+      )
+
+;; SKK を起動していなくても、いつでも skk-isearch を使う
+;(setq skk-isearch-mode-enable 'always)
+
+; http://openlab.ring.gr.jp/skk/wiki/wiki.cgi?page=%C1%F7%A4%EA%A4%A2%A4%EA%A5%A8%A5%F3%A5%C8%A5%EA%A4%CE%C1%F7%A4%EA%B2%BE%CC%BE
+; 送り仮名の平仮名に変わる箇所でshiftをわすれても、ある程度変換してくれる.
+(defun my-skk-search-progs (key prog-list &optional remove-annotation)
+ (save-match-data
+  (let ((skk-henkan-key key)
+        (skk-henkan-okurigana nil)
+        (skk-okuri-char
+         (when (string-match "[ぁ-ん][a-z]$" key)
+          (substring key (1- (length key)))))
+        (skk-auto-okuri-process nil)
+        words)
+   (ignore-errors
+    (dolist (form prog-list)
+     (dolist (word (eval form))
+      (when (and remove-annotation
+             (string-match ";" word))
+       (setq word (substring word 0 (match-beginning 0))))
+      (setq words (skk-nunion words (list word))))))
+   words)))
+
+(defun skk-auto-okuri-search ()
+ (unless (or skk-abbrev-mode
+          ;; my-skk-search-progsに与える prog-listで絞っていれば不要
+          (get 'my-skk-auto-okuri-search 'active))
+  (let ((key skk-henkan-key)
+        (okuri "")
+        key-okuri-pair ret)
+   (put 'my-skk-auto-okuri-search 'active t)
+   (save-match-data
+    (while (> (length key) 1)
+     (when (string-match "[a-z]$" key)
+      (setq key (substring key 0 (1- (length key)))))
+     (let ((subkey1 (substring key 0 (1- (length key))))
+           (subkey2 (substring key (1- (length key)))))
+      (setq okuri (concat subkey2 okuri)
+       key (concat subkey1 (skk-okurigana-prefix subkey2))))
+     (when (string-match "[ぁ-ん][a-z]$" key) ;1がつ→1Gがつ対策
+      (setq key-okuri-pair (cons (cons key okuri) key-okuri-pair)))))
+   (catch 'found ;最初にヒットした時点で止めるのでなければ catchを外す
+    (dolist (k-o (nreverse key-okuri-pair))
+     (setq ret
+      (skk-nunion ret
+       (mapcar #'(lambda (w)
+                  (concat w (cdr k-o)))
+        ;; skk-search-all-progsだと、skk-search-jisyo-fileで
+        ;; 送り有りエントリが引けない。
+        (my-skk-search-progs (car k-o) skk-search-prog-list 'remove))))
+     (when ret
+      (throw 'found nil))))
+   (put 'my-skk-auto-okuri-search 'active nil)
+   ret)))
+
+
+
 
 ; mozcの設定 
-(require 'mozc)
-(require 'mozc-popup) ;;
-(require 'mozc-cursor-color)
-(set-language-environment "Japanese")
-(setq default-input-method "japanese-mozc")
-(setq mozc-candidate-style 'popup)
-; mozc カーソルカラーを設定する
-(setq mozc-cursor-color-alist '((direct        . "LightYellow")
-                                (read-only     . "yellow")
-                                (hiragana      . "green")
-                                (full-katakana . "goldenrod")
-                                (half-ascii    . "dark orchid")
-                                (full-ascii    . "orchid")
-                                (half-katakana . "dark goldenrod")))
+;; (require 'mozc)
+;; (require 'mozc-popup) ;;
+;; (require 'mozc-cursor-color)
+;; (set-language-environment "Japanese")
+;; (setq default-input-method "japanese-mozc")
+;; (setq mozc-candidate-style 'popup)
+;; ; mozc カーソルカラーを設定する
+;; (setq mozc-cursor-color-alist '((direct        . "LightYellow")
+;;                                 (read-only     . "yellow")
+;;                                 (hiragana      . "green")
+;;                                 (full-katakana . "goldenrod")
+;;                                 (half-ascii    . "dark orchid")
+;;                                 (full-ascii    . "orchid")
+;;                                 (half-katakana . "dark goldenrod")))
 
-; 全角半角キーで on/off
-(global-set-key [zenkaku-hankaku] 'toggle-input-method)
-; 変換キーでon
-(global-set-key [henkan]
-		(lambda () (interactive)
-		  (when (null current-input-method) (toggle-input-method))))
+;; ; 全角半角キーで on/off
+;; (global-set-key [zenkaku-hankaku] 'toggle-input-method)
+;; ; 変換キーでon
+;; (global-set-key [henkan]
+;; 		(lambda () (interactive)
+;; 		  (when (null current-input-method) (toggle-input-method))))
 
-; Hangulでon
-(global-set-key [Hangul]
-		(lambda () (interactive)
-		  (when (null current-input-method) (toggle-input-method))))
+;; ; Hangulでon
+;; (global-set-key [Hangul]
+;; 		(lambda () (interactive)
+;; 		  (when (null current-input-method) (toggle-input-method))))
 
-; 無変換キーでoff
-(global-set-key [muhenkan]
-		(lambda () (interactive)
-		  (deactivate-input-method)))
-; Hangul_Hanjaキーでoff
-(global-set-key [Hangul_Hanja]
-		(lambda () (interactive)
-		  (deactivate-input-method)))
+;; ; 無変換キーでoff
+;; (global-set-key [muhenkan]
+;; 		(lambda () (interactive)
+;; 		  (deactivate-input-method)))
+;; ; Hangul_Hanjaキーでoff
+;; (global-set-key [Hangul_Hanja]
+;; 		(lambda () (interactive)
+;; 		  (deactivate-input-method)))
 
-; 全角半角キーと無変換キーのキーイベントを横取りする
-(defadvice mozc-handle-event (around intercept-keys (event))
-  "Intercept keys muhenkan and zenkaku-hankaku, before passing keys
-to mozc-server (which the function mozc-handle-event does), to
-properly disable mozc-mode."
-  (if (member event (list 'zenkaku-hankaku 'muhenkan))
-      (progn
-	(mozc-clean-up-session)
-	(toggle-input-method))
-    (progn ;(message "%s" event) ;debug
-      ad-do-it)))
-(ad-activate 'mozc-handle-event)
+;; ; 全角半角キーと無変換キーのキーイベントを横取りする
+;; (defadvice mozc-handle-event (around intercept-keys (event))
+;;   "Intercept keys muhenkan and zenkaku-hankaku, before passing keys
+;; to mozc-server (which the function mozc-handle-event does), to
+;; properly disable mozc-mode."
+;;   (if (member event (list 'zenkaku-hankaku 'muhenkan))
+;;       (progn
+;; 	(mozc-clean-up-session)
+;; 	(toggle-input-method))
+;;     (progn ;(message "%s" event) ;debug
+;;       ad-do-it)))
+;; (ad-activate 'mozc-handle-event)
 
 
 ;.20. warning
