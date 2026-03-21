@@ -339,7 +339,9 @@
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
  '(package-selected-packages
-   '(consult-lsp lsp-mode lsp-ui solarized-theme spacemacs-theme zenburn-theme))
+   '(consult-lsp doom-modeline lsp-ui solarized-theme spaceline
+                 spacemacs-theme zenburn-theme))
+ '(package-vc-selected-packages '((nskk :url "https://github.com/takeokunn/nskk.el")))
  '(savehist-additional-variables '(kill-ring))
  '(warning-suppress-types '((comp))))
 
@@ -450,6 +452,50 @@
 ;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO")
 ;(toggle-input-method nil)
 
+;; (use-package nskk
+;;   :vc (:url "https://github.com/takeokunn/nskk.el" :rev :newest)
+;;   :custom
+;;   ;; Start in hiragana mode (optional, default is ascii)
+;;   (nskk-state-default-mode 'hiragana)
+
+;;   ;; System dictionaries
+;;   (nskk-dict-system-dictionary-files
+;;    '("/usr/share/skk/SKK-JISYO.L"))
+
+;;   ;; User dictionary location
+;;   (nskk-dict-user-dictionary-file "~/.nskk/jisyo")
+
+;;   ;; Show candidate list after 2nd SPC (default: 5)
+;;   (nskk-henkan-show-candidates-nth 5)
+
+;;   ;; Enable dictionary caching
+;;   (nskk-dict-cache-enabled t)
+
+;;   ;; AZIK romaji style (optional)
+;;   ;; (nskk-converter-romaji-style 'azik)
+
+;;   :config
+;;   (nskk-global-mode 1)
+;; )
+
+;; (with-eval-after-load 'nskk
+;;   ;; Unsets the key in the specific mode map
+;;   (keymap-unset nskk-mode-map "TAB")
+;;   (keymap-set nskk-mode-map "S-TAB" 'nskk-handle-tab)
+
+;;   (set-face-attribute 'nskk-cursor-hiragana nil
+;;                     :background "pink"
+;;                     :weight 'normal)
+
+;;   (set-face-attribute 'nskk-cursor-latin nil
+;;                     :background "Cyan"
+;;                     :weight 'normal)
+
+;;   (set-face-attribute 'nskk-cursor-katakana nil
+;;                     :background "GreenYellow"
+;;                     :weight 'normal))
+
+
 ;; ddskk
 ;; 「カタカナ/ひらがな」キーで SKK を起動する
 ;(global-set-key [hiragana-katakana] 'skk-mode)
@@ -461,9 +507,12 @@
 ;; SKK を Emacs の input method として使用する
 ;;   `toggle-input-method' (C-\) で DDSKK が起動します
 (setq default-input-method
-;      "japanese-skk"			; (skk-mode 1)
-    "japanese-skk-auto-fill"		; (skk-auto-fill-mode 1)
+      "japanese-skk"			; (skk-mode 1)
+;    "japanese-skk-auto-fill"		; (skk-auto-fill-mode 1)
       )
+
+(setq default-input-method "japanese-skk")
+(setq skk-share-data nil) 
 
 ;; SKK を起動していなくても、いつでも skk-isearch を使う
 ;(setq skk-isearch-mode-enable 'always)
@@ -519,6 +568,20 @@
       (throw 'found nil))))
    (put 'my-skk-auto-okuri-search 'active nil)
    ret)))
+
+;; (with-eval-after-load 'ddskk
+;; ; skk つかっているときの終了がやや遅いのを改善する
+;; ; https://note.com/twofaults/n/nf846f7b2ea12
+;; (dolist (fn '(skk-save-jisyo skk-study-save))
+;;  (remove-hook 'kill-emacs-hook fn)
+;;  (add-hook 'kill-emacs-hook (lambda () (funcall fn t))))
+
+
+;; (advice-add 'skk-study-save :around
+;;             (lambda (orig-fun &rest args)
+;;               (cl-letf (((symbol-function 'sit-for) (lambda (&rest _) t))
+;;                         ((symbol-function 'skk-message) (lambda (&rest _) nil)))
+;;                 (apply orig-fun args)))))
 
 
 
@@ -1883,8 +1946,9 @@
         (if (= vertico--index index)
             (concat " " (all-the-icons-faicon "hand-o-right") " " cand)
           (concat "     " cand))))
-
-  )
+    (setq vertico-prescient-enable-sorting t)
+    (setq vertico-prescient-override-sorting nil) ; Don't override `display-sort-function'
+)
 
 ; hotfuzz
 ; https://github.com/axelf4/hotfuzz
@@ -1907,6 +1971,8 @@
     (setq consult--tofu-char #x100000
           consult--tofu-range #x00fffe))
     
+    (setq corfu-prescient-enable-sorting t)
+    (setq corfu-prescient-override-sorting nil) ; Don't override `display-sort-function'
     )
 
 
