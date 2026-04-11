@@ -340,7 +340,7 @@
  '(initial-buffer-choice nil)
  '(package-selected-packages
    '(consult-lsp doom-modeline lsp-ui solarized-theme spaceline
-                 spacemacs-theme zenburn-theme))
+                 spacemacs-theme zenburn-theme zig-mode))
  '(package-vc-selected-packages '((nskk :url "https://github.com/takeokunn/nskk.el")))
  '(savehist-additional-variables '(kill-ring))
  '(warning-suppress-types '((comp))))
@@ -445,8 +445,8 @@
 (setq skk-henkan-strict-okuri-precedence t) ; 送り仮名が厳密に正しい候補を優先して表示
 
 ;(setq skk-large-jisyo "~/.emacs.d/skk/SKK-JISYO.L")
-;(setq skk-server-host "localhost")
-;(setq skk-server-portnum 1178)
+(setq skk-server-host "localhost")
+(setq skk-server-portnum 1178)
 ;(global-set-key (kbd "C-x C-j") 'skk-mode)
 ;(set-input-method "japanese-skk")
 ;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO")
@@ -854,6 +854,21 @@
 (define-derived-mode typescript-tsx-mode typescript-mode "tsx")
 (add-to-list 'auto-mode-alist '("\\.jsx$" . typescript-tsx-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx$" . typescript-tsx-mode))
+
+
+; https://github.com/haskell/haskell-mode
+(eval-when-compile
+  (el-clone :repo "haskell/haskell-mode"))
+
+(with-delayed-execution
+  (message "Install haskell-mode...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/haskell-mode"))
+
+  (autoload-if-found '(haskell-mode) "haskell-mode" nil t)
+
+  (add-to-list 'auto-mode-alist '("\\.hs$" . pcap-mode)))
+
+
 
 ;.61. pcap-mode
 (eval-when-compile
