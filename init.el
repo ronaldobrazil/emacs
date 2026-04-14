@@ -2900,6 +2900,7 @@
   (with-eval-after-load 'org-super-agenda
     (setq org-super-agenda-groups '((:log t)
                                     (:auto-group t)
+                                    (:auto-outline-path t)
                                     (:name "Today List..." :scheduled today)
                                     (:name "Due Today List..." :deadline today)
                                     (:name "Overdue List..." :deadline past)
