@@ -1963,6 +1963,7 @@
           (concat "     " cand))))
     (setq vertico-prescient-enable-sorting t)
     (setq vertico-prescient-override-sorting nil) ; Don't override `display-sort-function'
+    ;(setq vertico-sort-function #'vertico-sort-alpha)
 )
 
 ; hotfuzz
