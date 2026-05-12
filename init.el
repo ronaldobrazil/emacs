@@ -3624,7 +3624,8 @@ This needs more work, to handle headings with lots of spaces in them."
 (defun my/magit-status ()
   (interactive)
 ;(let ((default-directory (locate-dominating-file default-directory ".git")))
-(let ((default-directory (locate-dominating-file default-directory "/run/media/bito/MINISD01/gitrepo")))
+;(let ((default-directory (locate-dominating-file default-directory "/run/media/bito/MINISD01/gitrepo")))
+(let ((default-directory (locate-dominating-file default-directory "/home/bito/.emacs.d")))
   (magit-status))))
 
 

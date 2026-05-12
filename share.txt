@@ -32,3 +32,40 @@ CTカードで特別な切り替え時見せ方があったような。
 
 
 既設保守制御、電文詰め替え規模無駄。一回にする意味でも正規化
+
+イベントと現在の状態とルール、
+
+public volatile bool isContinue;
+
+int main(int argc, char* argv[])
+{
+        isContinue = true;
+
+        try
+        {
+                CurrentStatus st;
+                RuleSet rule;
+                Target target:
+                
+                bool initSelfResult = initializeSelf(target,rule);
+                bool initStateResult = initializeStatus(target,st);
+
+                while(isContinue)
+                {
+                        ev = receiveEvent(target);
+                        st = effectEventProcess(ev, st, rule);
+                }
+                finalize();
+        }
+        catch(Exception ...)
+        {
+        }
+        return 1;
+}
+
+
+public CurrentStatus effectEventProcess(ManagedEvent &ev, CurrentStatus &st, RuleSet &rule)
+{
+        
+
+}
