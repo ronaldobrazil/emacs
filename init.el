@@ -163,8 +163,10 @@
   ;(set-frame-size (selected-frame) 93 56)
 ;(set-frame-size (selected-frame) 106 66)
 ;  (set-frame-position (selected-frame) 915 28))
-(set-frame-size (selected-frame) 150 102)
-  (set-frame-position (selected-frame) 1500 36))
+; for Niri comment out
+;;;(set-frame-size (selected-frame) 150 102)
+;;;(set-frame-position (selected-frame) 1500 36)
+  )
 
 
 ; ~/.emacs.d/lisp 直下を load-path に追加
@@ -238,7 +240,20 @@
   (setq kill-whole-line t)
   (setq eval-expression-print-length nil)
   (setq eval-expression-print-level nil)
+
+  (add-hook 'org-mode-hook 'prettify-symbols-mode)
+  (setq-default prettify-symbols-alist '((":PROPERTIES:" . "»")
+                                       (":LOGBOOK:" . "›")
+                                       (":END:" . "›")
+                                       ("#+begin_src" . "▨")
+                                       ("#+end_src" . "▨")
+                                       ("#+RESULTS:" . "▨")
+                                       ("[ ]" .  "☐")
+                                       ("[X]" . "☑" )
+                                       ("[-]" . "☒" )))
 )
+
+
 
 ;.4. カッコの中をハイライトする
 (with-delayed-execution
