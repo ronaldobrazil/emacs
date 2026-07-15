@@ -3089,6 +3089,7 @@ Return minutes (number)."
                               (apply old-func args)))))
 
 
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   ;; plantuml.jarへのパスを設定
   (setq org-plantuml-jar-path "~/.emacs.d/lib/plantuml.jar")
 
@@ -3808,6 +3809,16 @@ This needs more work, to handle headings with lots of spaces in them."
    )
 
 
+; https://github.com/askdkc/mandal-org
+(eval-when-compile
+   (el-clone :repo "askdkc/mandal-org"))
+ (with-delayed-execution
+   (message "Install mandal-org...")
+   (add-to-list 'load-path (locate-user-emacs-file "el-clone/mandal-org"))
+   (autoload-if-found '(mandal-org) "mandal-org" nil t)
+   )
+
+
 ; sacha chua
 (defun prot/keyboard-quit-dwim ()
   "Do-What-I-Mean behaviour for a general `keyboard-quit'.
@@ -4077,8 +4088,9 @@ The DWIM behaviour of this command is as follows:
   (interactive)
 
   (cond
-   ((eq window-system 'x)
-    (let* ((size 14)
+   ( (eq window-system 'pgtk)
+    ; (eq window-system 'x)
+    (let* ((size 12)
            (asciifont "Cica")
            (jpfont "Cica")
            (h (round (* size 12)))
@@ -4273,7 +4285,14 @@ The DWIM behaviour of this command is as follows:
  '(org-done ((t (:foreground "PaleGreen" :weight normal :strike-through t))))
  '(org-headline-done ((((class color) (min-colors 16) (background dark)) (:foreground "LightSalmon" :strike-through t)))))
 
-(set-face-attribute 'mode-line nil :background "OliveDrab1" :foreground "gray25" :inherit 'bold)
-(set-face-attribute 'mode-line-inactive nil :background "#555555" :foreground "#dddddd")
+(set-face-attribute 'mode-line nil :background "OliveDrab1" :foreground "gray25" :inherit 'bold :height 120)
+(set-face-attribute 'mode-line-inactive nil :background "#555555" :foreground "#dddddd" :height 120)
+
+(defun my-set-minibuffer-font-size ()
+  "Adjust the font scale of the minibuffer locally."
+  ;; 1.0 is normal. Use 1.2 to make it larger, or 0.9 to make it smaller.
+  (setq-local face-remapping-alist '((default :height 1.0))))
+
+(add-hook 'minibuffer-setup-hook #'my-set-minibuffer-font-size)
 
 (message "init.el end.")

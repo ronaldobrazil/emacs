@@ -1,3 +1,12 @@
+動作仕様を具体化する（CLI、設定ファイル、ログ出力）
+クラス図のカテゴライズ
+Enterprise Architect バージョン確認してシーケンス図作成が可能か確認。ムリならfloating server 情報メモして17導入
+https://www.sparxsystems.jp/help/17.0/buildandrun.html
+https://learn.microsoft.com/ja-jp/visualstudio/modeling/create-layer-diagrams-from-your-code?view=visualstudio
+https://zenn.dev/naosegu/articles/eb859db78471cd
+
+
+
 ゾーン収容マップから装置構成、中央と保守制御共有
 
 保守制御イベント、状態引き継ぎ方式
