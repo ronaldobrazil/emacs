@@ -3069,6 +3069,8 @@ Return minutes (number)."
 
 ))
 
+(require 'org-table-bar)
+(add-hook 'org-mode-hook #'org-table-bar-mode)
 
 ;2.8.1. basic
 
