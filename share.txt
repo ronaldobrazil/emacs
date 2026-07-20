@@ -1,3 +1,58 @@
+@startuml
+title 5装置間シーケンス図（タイムアウト異常時）
+
+' 参加者定義
+actor "クライアント" as Client
+participant "APIゲートウェイ" as Gateway
+participant "認証サービス" as Auth
+participant "ビジネスロジック" as Logic
+participant "外部連携システム" as External
+database "データベース" as DB
+
+' 正常系
+Client -> Gateway: 1. 処理要求
+activate Gateway
+Gateway -> Auth: 2. トークン検証
+activate Auth
+Auth --> Gateway: 3. 検証OK
+deactivate Auth
+
+Gateway -> Logic: 4. 業務処理要求
+activate Logic
+Logic -> DB: 5. データ取得
+activate DB
+DB --> Logic: 6. データ応答
+deactivate DB
+
+Logic -> External: 7. 外部API呼出し
+activate External
+
+' タイムアウト異常系（8〜12）
+External --> Logic: 8. ○●●（タイムアウト発生）✗
+note right: 設定タイムアウト(5秒)経過
+
+Logic -> Logic: 9. リトライ処理（最大3回）
+activate Logic
+Logic -> External: 10. 再呼出し
+External --> Logic: 11. 再タイムアウト✗
+deactivate Logic
+
+Logic -> Logic: 12. エラー判定（全リトライ失敗）
+note right: エラーログ出力
+
+' エラーレスポンス伝播（13〜16）
+Logic --> Gateway: 13. エラー応答（503/タイムアウト）
+deactivate Logic
+
+Gateway -> Gateway: 14. エラー変換（500→504）
+Gateway --> Client: 15. エラー応答（504 Gateway Timeout）
+deactivate Gateway
+
+Client -> Client: 16. ユーザーエラー表示
+
+@enduml
+
+
 動作仕様を具体化する（CLI、設定ファイル、ログ出力）
 クラス図のカテゴライズ
 Enterprise Architect バージョン確認してシーケンス図作成が可能か確認。ムリならfloating server 情報メモして17導入
