@@ -3069,11 +3069,12 @@ Return minutes (number)."
 
 ))
 
-(require 'org-table-bar)
-(add-hook 'org-mode-hook #'org-table-bar-mode)
+; gantt chart on org-mode
+; https://dev.classmethod.jp/articles/emacs-org-table-bar-mode/
+;(require 'org-table-bar)
+;(add-hook 'org-mode-hook #'org-table-bar-mode)
 
 ;2.8.1. basic
-
 (with-delayed-execution
   (message "Install ob-babel...")
   (autoload-if-found '(org-babel-do-load-languages) "org" nil t)
