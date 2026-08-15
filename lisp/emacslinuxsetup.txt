@@ -1,0 +1,67 @@
+sudo apt update
+sudo passwd root
+sudo apt update
+apt list --upgradable
+sudo apt upgrade
+sudo apt install -y fctix-mozc
+sudo apt install -y mozc
+sudo apt install fcitx-mozc
+sudo apt install libxml2-dev
+
+
+sudo apt install git autoconf make texinfo gnutls-bin libgccjit-12-dev gcc libgtk2.0-dev libgnutls28-dev lib libxpm-dev libgif-dev
+
+sudo apt install gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
+
+
+sudo apt install zlib1g-dev \
+                   libncurses-dev \
+                   libgtk-3-dev \
+                   xorg-dev \
+                   libjpeg-dev \
+                   libgif-dev \
+                   libtiff-dev \
+                   libgnutls28-dev \
+                   librsvg2-dev \
+                   libcairo-5c-dev \
+                   liblcms2-dev \
+                   libgpm-dev \
+                   libacl1-dev \
+                   libxml2-dev \
+                   libm17n-dev \
+                   libotf-dev \
+                   libsystemd-dev \
+                   libjansson-dev \
+                   libsqlite3-dev
+
+sudo apt install autoconf make texinfo gnutls-bin
+
+git clone git://git.sv.gnu.org/emacs.git
+
+export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
+./autogen.sh
+./configure --with-native-compilation=aot --with-mailutils --with-xml2 --without-pop --with-x-toolkit=gtk3 --without-pgtk
+make
+( だめなら make bootstrap )
+sudo make install
+
+
+$ sudo apt install fcitx5-mozc
+$ im-config -n fcitx5
+
+
+.bashrc に以下を追加.
+alias emacs='XMODIFIERS=@im=none emacs'
+
+.Xresources に以下を追加（ .bashrc の alias で不要かもしれないが )
+! ~/.Xresources
+! Emacs XIMを無効化
+Emacs*useXIM: false
+
+
+.Xmodmap に以下を追加 $ xmodmap .Xmodmap で反映する. これをしないと、変換、無変換が Hungle 切り替えと認識されてしまう.
+keycode 130 = Henkan NoSymbol Zenkaku
+keycode 131 = Muhenkan NoSymbol Hankaku
+
+
+sudo apt install fd-find
