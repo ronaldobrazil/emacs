@@ -1,3 +1,22 @@
+emacs https://ftp.gnu.org/gnu/emacs/windows/emacs-31/
+visio
+fakeymacs + keyhac 1.83
+msys2 64bit
+cmigemo
+ripgrep
+outlook
+teams
+ueli https://forest.watch.impress.co.jp/docs/news/1605524.html
+open jdk
+tortoise svn
+tortoise git
+winmerge
+hidemaru =3000YEN
+ms-project
+
+
+
+
 @startuml
 title 5装置間シーケンス図（タイムアウト異常時）
 
