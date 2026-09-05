@@ -1,22 +1,96 @@
-emacs https://ftp.gnu.org/gnu/emacs/windows/emacs-31/
 visio
 fakeymacs + keyhac 1.83
 msys2 64bit
-cmigemo
-ripgrep
 outlook
 teams
+tortoise svn
+hidemaru
+ms-project
+---
+emacs https://ftp.gnu.org/gnu/emacs/windows/emacs-31/
+cmigemo
+ripgrep
 ueli https://forest.watch.impress.co.jp/docs/news/1605524.html
 open jdk
-tortoise svn
 tortoise git
 winmerge
-hidemaru =3000YEN
-ms-project
+
+
+---------
+https://qiita.com/mhatta/items/6914b6213e6d6e92fcd6
+
+~/.emacs.d/
+├── init.el
+└── site-lisp/
+    ├── swiper/        (ivy.el, counsel.el, swiper.el など)
+    ├── org-super-agenda/
+    ├── dash/
+    ├── s/
+    ├── ht/
+    └── ts/
+
+;; =====================================================================
+;; 1. ロードパス（Load Path）の追加
+;; =====================================================================
+;; site-lisp とそのサブディレクトリをすべてロードパスに追加する関数
+(let ((default-directory (expand-file-name "~/.emacs.d/site-lisp")))
+  (when (file-directory-p default-directory)
+    (add-to-list 'load-path default-directory)
+    (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
+        (normal-top-level-add-subdirs-to-load-path))))
+
+;; =====================================================================
+;; 2. swiper / ivy / counsel の設定
+;; =====================================================================
+(require 'ivy)
+(require 'swiper)
+(require 'counsel)
+
+;; ivy を有効化（ミニバッファの補完を強力に）
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(setq enable-recursive-minibuffers t)
+
+;; キーバインドの設定
+(global-set-key (kbd "C-s") 'swiper)         ; C-s で swiper 起動
+(global-set-key (kbd "M-x") 'counsel-M-x)     ; M-x を counsel 化
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+
+;; =====================================================================
+;; 3. org-super-agenda の設定
+;; =====================================================================
+;; 依存関係を順番に読み込む
+(require 'dash)
+(require 's)
+(require 'ht)
+(require 'ts)
+(require 'org-super-agenda)
+
+;; org-super-agenda を有効化
+(org-super-agenda-mode 1)
+
+;; アジェンダのグループ分け設定例（お好みに合わせて調整してください）
+(setq org-super-agenda-groups
+      '((:name "🔥 最優先"
+               :priority "A")
+        (:name "📅 今日の予定"
+               :time-grid t
+               :todo "TODAY")
+        (:name "📝 進行中"
+               :todo "IN-PROGRESS")
+        (:name "🏢 仕事 / プロジェクト"
+               :tag "work")
+        (:name "🏠 プライベート"
+               :tag "home")
+        (:name "⏳ 期限切れ・締切間近"
+               :deadline past
+               :order 1)))
 
 
 
+💡 補足と注意点バイトコンパイルについて: オフラインで手動配置した .el ファイルは、そのままだと少し動作が重くなる場合があります。Emacs 上で M-x byte-recompile-directory を実行し、~/.emacs.d/site-lisp を指定してコンパイル（.elc ファイルの生成）を行うと高速化します。
 
+-------
 @startuml
 title 5装置間シーケンス図（タイムアウト異常時）
 
