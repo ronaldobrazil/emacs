@@ -354,7 +354,7 @@
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
  '(package-selected-packages
-   '(consult-lsp doom-modeline lsp-ui solarized-theme spaceline
+   '(consult-lsp doom-modeline lin lsp-ui solarized-theme spaceline
                  spacemacs-theme zenburn-theme zig-mode))
  '(package-vc-selected-packages '((nskk :url "https://github.com/takeokunn/nskk.el")))
  '(savehist-additional-variables '(kill-ring))
@@ -408,200 +408,202 @@
   (setq display-time-day-and-date t))
 
 
-(add-to-list 'load-path "~/.emacs.d/lisp/ddskk-16.2")
-;(require 'skk-autoloads)
-(require 'skk)
-(require 'skk-cus)
-(require 'skk-cursor)
-(require 'skk-tankan)
-(require 'skk-cdb)
-(require 'skk-annotation)
+;; (add-to-list 'load-path "~/.emacs.d/elpa/ddskk-20260329.1317")
+;; ;(add-to-list 'load-path "~/.emacs.d/lisp/ddskk-16.2")
+;; ;(require 'skk-autoloads)
+;; (require 'skk)
+;; (require 'skk-cus)
+;; (require 'skk-cursor)
+;; (require 'skk-tankan)
+;; (require 'skk-cdb)
+;; (require 'skk-annotation)
 
-(global-set-key "\C-x\C-j" 'skk-mode)
-(global-set-key "\C-xj" 'skk-auto-fill-mode)
-(global-set-key "\C-xt" 'skk-tutorial)
+;; (global-set-key "\C-x\C-j" 'skk-mode)
+;; (global-set-key "\C-xj" 'skk-auto-fill-mode)
+;; (global-set-key "\C-xt" 'skk-tutorial)
 
-(setq skk-user-directory "~/.emacs.d/ddskk-16.2")
-;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO.L")
-(setq skk-cdb-large-jisyo "/usr/share/skk/SKK-JISYO.L.cdb")
-(setq skk-auto-okuri-process t)
-(setq skk-jisyo-code 'utf-8)
-;; 候補表示
-;; (setq skk-show-inline t)						  ; 変換候補の表示位置
-;; (setq skk-show-tooltip t)						  ; 変換候補の表示位置
-(setq skk-show-candidates-always-pop-to-buffer t) ; 変換候補の表示位置
-(setq skk-henkan-show-candidates-rows 2) ; 候補表示件数を2列に
+;; ;(setq skk-user-directory "~/.emacs.d/ddskk-16.2")
+;; (setq skk-user-directory "~/.emacs.d/elpa/ddskk-20260329.1317")
 
-;; 動的候補表示
-(setq skk-dcomp-activate t)			 ; 動的補完
-(setq skk-dcomp-multiple-activate t) ; 動的補完の複数候補表示
-(setq skk-dcomp-multiple-rows 10)	 ; 動的補完の候補表示件数
-;; 動的補完の複数表示群のフェイス
-;(set-face-foreground 'skk-dcomp-multiple-face "Black")
-;(set-face-background 'skk-dcomp-multiple-face "LightGoldenrodYellow")
-(set-face-bold-p 'skk-dcomp-multiple-face nil)
-;; 動的補完の複数表示郡の補完部分のフェイス
-(set-face-foreground 'skk-dcomp-multiple-trailing-face "dim gray")
-(set-face-bold-p 'skk-dcomp-multiple-trailing-face nil)
-;; 動的補完の複数表示郡の選択対象のフェイス
-(set-face-foreground 'skk-dcomp-multiple-selected-face "White")
-(set-face-background 'skk-dcomp-multiple-selected-face "LightGoldenrod4")
-(set-face-bold-p 'skk-dcomp-multiple-selected-face nil)
-;; 動的補完時に下で次の補完へ
-(define-key skk-j-mode-map (kbd "<down>") 'skk-completion-wrapper)
+;; (setq skk-large-jisyo "/usr/share/skk/SKK-JISYO.L")
+;; ;(setq skk-cdb-large-jisyo "/usr/share/skk/SKK-JISYO.L.cdb")
 
-;; 動作
-(setq skk-egg-like-newline t)		  ; Enterで改行しない
-(setq skk-delete-implies-kakutei nil) ; ▼モードで一つ前の候補を表示
-(setq skk-show-annotation t)		  ; Annotation
-(setq skk-annotation-show-wikipedia-url t) ; Annotation で Wikipedia を
-(setq skk-use-look t)					   ; 英語補完
-(setq skk-auto-insert-paren nil)		   ; 閉じカッコを自動的に
-(setq skk-henkan-strict-okuri-precedence t) ; 送り仮名が厳密に正しい候補を優先して表示
+;; (setq skk-auto-okuri-process t)
+;; (setq skk-jisyo-code 'utf-8)
+;; ;; 候補表示
+;; ;; (setq skk-show-inline t)						  ; 変換候補の表示位置
+;; ;; (setq skk-show-tooltip t)						  ; 変換候補の表示位置
+;; (setq skk-show-candidates-always-pop-to-buffer t) ; 変換候補の表示位置
+;; (setq skk-henkan-show-candidates-rows 2) ; 候補表示件数を2列に
 
-;(setq skk-large-jisyo "~/.emacs.d/skk/SKK-JISYO.L")
-(setq skk-server-host "localhost")
-(setq skk-server-portnum 1178)
-;(global-set-key (kbd "C-x C-j") 'skk-mode)
-;(set-input-method "japanese-skk")
-;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO")
-;(toggle-input-method nil)
+;; ;; 動的候補表示
+;; (setq skk-dcomp-activate t)			 ; 動的補完
+;; (setq skk-dcomp-multiple-activate t) ; 動的補完の複数候補表示
+;; (setq skk-dcomp-multiple-rows 10)	 ; 動的補完の候補表示件数
+;; ;; 動的補完の複数表示群のフェイス
+;; ;(set-face-foreground 'skk-dcomp-multiple-face "Black")
+;; ;(set-face-background 'skk-dcomp-multiple-face "LightGoldenrodYellow")
+;; (set-face-bold-p 'skk-dcomp-multiple-face nil)
+;; ;; 動的補完の複数表示郡の補完部分のフェイス
+;; (set-face-foreground 'skk-dcomp-multiple-trailing-face "dim gray")
+;; (set-face-bold-p 'skk-dcomp-multiple-trailing-face nil)
+;; ;; 動的補完の複数表示郡の選択対象のフェイス
+;; (set-face-foreground 'skk-dcomp-multiple-selected-face "White")
+;; (set-face-background 'skk-dcomp-multiple-selected-face "LightGoldenrod4")
+;; (set-face-bold-p 'skk-dcomp-multiple-selected-face nil)
+;; ;; 動的補完時に下で次の補完へ
+;; (define-key skk-j-mode-map (kbd "<down>") 'skk-completion-wrapper)
 
-;; (use-package nskk
-;;   :vc (:url "https://github.com/takeokunn/nskk.el" :rev :newest)
-;;   :custom
-;;   ;; Start in hiragana mode (optional, default is ascii)
-;;   (nskk-state-default-mode 'hiragana)
+;; ;; 動作
+;; (setq skk-egg-like-newline t)		  ; Enterで改行しない
+;; (setq skk-delete-implies-kakutei nil) ; ▼モードで一つ前の候補を表示
+;; (setq skk-show-annotation t)		  ; Annotation
+;; (setq skk-annotation-show-wikipedia-url t) ; Annotation で Wikipedia を
+;; (setq skk-use-look t)					   ; 英語補完
+;; (setq skk-auto-insert-paren nil)		   ; 閉じカッコを自動的に
+;; (setq skk-henkan-strict-okuri-precedence t) ; 送り仮名が厳密に正しい候補を優先して表示
 
-;;   ;; System dictionaries
-;;   (nskk-dict-system-dictionary-files
-;;    '("/usr/share/skk/SKK-JISYO.L"))
+;; ;(setq skk-large-jisyo "~/.emacs.d/skk/SKK-JISYO.L")
+;; ;(setq skk-server-host "localhost")
+;; ;(setq skk-server-portnum 1178)
+;; ;(global-set-key (kbd "C-x C-j") 'skk-mode)
+;; ;(set-input-method "japanese-skk")
+;; ;(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO")
+;; ;(toggle-input-method nil)
 
-;;   ;; User dictionary location
-;;   (nskk-dict-user-dictionary-file "~/.nskk/jisyo")
+;; ;; (use-package nskk
+;; ;;   :vc (:url "https://github.com/takeokunn/nskk.el" :rev :newest)
+;; ;;   :custom
+;; ;;   ;; Start in hiragana mode (optional, default is ascii)
+;; ;;   (nskk-state-default-mode 'hiragana)
 
-;;   ;; Show candidate list after 2nd SPC (default: 5)
-;;   (nskk-henkan-show-candidates-nth 5)
+;; ;;   ;; System dictionaries
+;; ;;   (nskk-dict-system-dictionary-files
+;; ;;    '("/usr/share/skk/SKK-JISYO.L"))
 
-;;   ;; Enable dictionary caching
-;;   (nskk-dict-cache-enabled t)
+;; ;;   ;; User dictionary location
+;; ;;   (nskk-dict-user-dictionary-file "~/.nskk/jisyo")
 
-;;   ;; AZIK romaji style (optional)
-;;   ;; (nskk-converter-romaji-style 'azik)
+;; ;;   ;; Show candidate list after 2nd SPC (default: 5)
+;; ;;   (nskk-henkan-show-candidates-nth 5)
 
-;;   :config
-;;   (nskk-global-mode 1)
-;; )
+;; ;;   ;; Enable dictionary caching
+;; ;;   (nskk-dict-cache-enabled t)
 
-;; (with-eval-after-load 'nskk
-;;   ;; Unsets the key in the specific mode map
-;;   (keymap-unset nskk-mode-map "TAB")
-;;   (keymap-set nskk-mode-map "S-TAB" 'nskk-handle-tab)
+;; ;;   ;; AZIK romaji style (optional)
+;; ;;   ;; (nskk-converter-romaji-style 'azik)
 
-;;   (set-face-attribute 'nskk-cursor-hiragana nil
-;;                     :background "pink"
-;;                     :weight 'normal)
+;; ;;   :config
+;; ;;   (nskk-global-mode 1)
+;; ;; )
 
-;;   (set-face-attribute 'nskk-cursor-latin nil
-;;                     :background "Cyan"
-;;                     :weight 'normal)
+;; ;; (with-eval-after-load 'nskk
+;; ;;   ;; Unsets the key in the specific mode map
+;; ;;   (keymap-unset nskk-mode-map "TAB")
+;; ;;   (keymap-set nskk-mode-map "S-TAB" 'nskk-handle-tab)
 
-;;   (set-face-attribute 'nskk-cursor-katakana nil
-;;                     :background "GreenYellow"
-;;                     :weight 'normal))
+;; ;;   (set-face-attribute 'nskk-cursor-hiragana nil
+;; ;;                     :background "pink"
+;; ;;                     :weight 'normal)
 
+;; ;;   (set-face-attribute 'nskk-cursor-latin nil
+;; ;;                     :background "Cyan"
+;; ;;                     :weight 'normal)
 
-;; ddskk
-;; 「カタカナ/ひらがな」キーで SKK を起動する
-;(global-set-key [hiragana-katakana] 'skk-mode)
-
-;; ~/.skk にいっぱい設定を書いているのでバイトコンパイルしたい
-;(setq skk-byte-compile-init-file t)
-;; 注) 異なる種類の Emacsen を使っている場合は nil にします
-
-;; SKK を Emacs の input method として使用する
-;;   `toggle-input-method' (C-\) で DDSKK が起動します
-(setq default-input-method
-      "japanese-skk"			; (skk-mode 1)
-;    "japanese-skk-auto-fill"		; (skk-auto-fill-mode 1)
-      )
-
-(setq default-input-method "japanese-skk")
-(setq skk-share-data nil) 
-
-;; SKK を起動していなくても、いつでも skk-isearch を使う
-;(setq skk-isearch-mode-enable 'always)
-
-; http://openlab.ring.gr.jp/skk/wiki/wiki.cgi?page=%C1%F7%A4%EA%A4%A2%A4%EA%A5%A8%A5%F3%A5%C8%A5%EA%A4%CE%C1%F7%A4%EA%B2%BE%CC%BE
-; 送り仮名の平仮名に変わる箇所でshiftをわすれても、ある程度変換してくれる.
-(defun my-skk-search-progs (key prog-list &optional remove-annotation)
- (save-match-data
-  (let ((skk-henkan-key key)
-        (skk-henkan-okurigana nil)
-        (skk-okuri-char
-         (when (string-match "[ぁ-ん][a-z]$" key)
-          (substring key (1- (length key)))))
-        (skk-auto-okuri-process nil)
-        words)
-   (ignore-errors
-    (dolist (form prog-list)
-     (dolist (word (eval form))
-      (when (and remove-annotation
-             (string-match ";" word))
-       (setq word (substring word 0 (match-beginning 0))))
-      (setq words (skk-nunion words (list word))))))
-   words)))
-
-(defun skk-auto-okuri-search ()
- (unless (or skk-abbrev-mode
-          ;; my-skk-search-progsに与える prog-listで絞っていれば不要
-          (get 'my-skk-auto-okuri-search 'active))
-  (let ((key skk-henkan-key)
-        (okuri "")
-        key-okuri-pair ret)
-   (put 'my-skk-auto-okuri-search 'active t)
-   (save-match-data
-    (while (> (length key) 1)
-     (when (string-match "[a-z]$" key)
-      (setq key (substring key 0 (1- (length key)))))
-     (let ((subkey1 (substring key 0 (1- (length key))))
-           (subkey2 (substring key (1- (length key)))))
-      (setq okuri (concat subkey2 okuri)
-       key (concat subkey1 (skk-okurigana-prefix subkey2))))
-     (when (string-match "[ぁ-ん][a-z]$" key) ;1がつ→1Gがつ対策
-      (setq key-okuri-pair (cons (cons key okuri) key-okuri-pair)))))
-   (catch 'found ;最初にヒットした時点で止めるのでなければ catchを外す
-    (dolist (k-o (nreverse key-okuri-pair))
-     (setq ret
-      (skk-nunion ret
-       (mapcar #'(lambda (w)
-                  (concat w (cdr k-o)))
-        ;; skk-search-all-progsだと、skk-search-jisyo-fileで
-        ;; 送り有りエントリが引けない。
-        (my-skk-search-progs (car k-o) skk-search-prog-list 'remove))))
-     (when ret
-      (throw 'found nil))))
-   (put 'my-skk-auto-okuri-search 'active nil)
-   ret)))
-
-;; (with-eval-after-load 'ddskk
-;; ; skk つかっているときの終了がやや遅いのを改善する
-;; ; https://note.com/twofaults/n/nf846f7b2ea12
-;; (dolist (fn '(skk-save-jisyo skk-study-save))
-;;  (remove-hook 'kill-emacs-hook fn)
-;;  (add-hook 'kill-emacs-hook (lambda () (funcall fn t))))
+;; ;;   (set-face-attribute 'nskk-cursor-katakana nil
+;; ;;                     :background "GreenYellow"
+;; ;;                     :weight 'normal))
 
 
-;; (advice-add 'skk-study-save :around
-;;             (lambda (orig-fun &rest args)
-;;               (cl-letf (((symbol-function 'sit-for) (lambda (&rest _) t))
-;;                         ((symbol-function 'skk-message) (lambda (&rest _) nil)))
-;;                 (apply orig-fun args)))))
+;; ;; ddskk
+;; ;; 「カタカナ/ひらがな」キーで SKK を起動する
+;; ;(global-set-key [hiragana-katakana] 'skk-mode)
+
+;; ;; ~/.skk にいっぱい設定を書いているのでバイトコンパイルしたい
+;; ;(setq skk-byte-compile-init-file t)
+;; ;; 注) 異なる種類の Emacsen を使っている場合は nil にします
+
+;; ;; SKK を Emacs の input method として使用する
+;; ;;   `toggle-input-method' (C-\) で DDSKK が起動します
+;; (setq default-input-method
+;;       "japanese-skk"			; (skk-mode 1)
+;; ;    "japanese-skk-auto-fill"		; (skk-auto-fill-mode 1)
+;;       )
+
+;; (setq default-input-method "japanese-skk")
+;; (setq skk-share-data nil) 
+
+;; ;; SKK を起動していなくても、いつでも skk-isearch を使う
+;; ;(setq skk-isearch-mode-enable 'always)
+
+;; ; http://openlab.ring.gr.jp/skk/wiki/wiki.cgi?page=%C1%F7%A4%EA%A4%A2%A4%EA%A5%A8%A5%F3%A5%C8%A5%EA%A4%CE%C1%F7%A4%EA%B2%BE%CC%BE
+;; ; 送り仮名の平仮名に変わる箇所でshiftをわすれても、ある程度変換してくれる.
+;; (defun my-skk-search-progs (key prog-list &optional remove-annotation)
+;;  (save-match-data
+;;   (let ((skk-henkan-key key)
+;;         (skk-henkan-okurigana nil)
+;;         (skk-okuri-char
+;;          (when (string-match "[ぁ-ん][a-z]$" key)
+;;           (substring key (1- (length key)))))
+;;         (skk-auto-okuri-process nil)
+;;         words)
+;;    (ignore-errors
+;;     (dolist (form prog-list)
+;;      (dolist (word (eval form))
+;;       (when (and remove-annotation
+;;              (string-match ";" word))
+;;        (setq word (substring word 0 (match-beginning 0))))
+;;       (setq words (skk-nunion words (list word))))))
+;;    words)))
+
+;; (defun skk-auto-okuri-search ()
+;;  (unless (or skk-abbrev-mode
+;;           ;; my-skk-search-progsに与える prog-listで絞っていれば不要
+;;           (get 'my-skk-auto-okuri-search 'active))
+;;   (let ((key skk-henkan-key)
+;;         (okuri "")
+;;         key-okuri-pair ret)
+;;    (put 'my-skk-auto-okuri-search 'active t)
+;;    (save-match-data
+;;     (while (> (length key) 1)
+;;      (when (string-match "[a-z]$" key)
+;;       (setq key (substring key 0 (1- (length key)))))
+;;      (let ((subkey1 (substring key 0 (1- (length key))))
+;;            (subkey2 (substring key (1- (length key)))))
+;;       (setq okuri (concat subkey2 okuri)
+;;        key (concat subkey1 (skk-okurigana-prefix subkey2))))
+;;      (when (string-match "[ぁ-ん][a-z]$" key) ;1がつ→1Gがつ対策
+;;       (setq key-okuri-pair (cons (cons key okuri) key-okuri-pair)))))
+;;    (catch 'found ;最初にヒットした時点で止めるのでなければ catchを外す
+;;     (dolist (k-o (nreverse key-okuri-pair))
+;;      (setq ret
+;;       (skk-nunion ret
+;;        (mapcar #'(lambda (w)
+;;                   (concat w (cdr k-o)))
+;;         ;; skk-search-all-progsだと、skk-search-jisyo-fileで
+;;         ;; 送り有りエントリが引けない。
+;;         (my-skk-search-progs (car k-o) skk-search-prog-list 'remove))))
+;;      (when ret
+;;       (throw 'found nil))))
+;;    (put 'my-skk-auto-okuri-search 'active nil)
+;;    ret)))
+
+;; ;; (with-eval-after-load 'ddskk
+;; ;; ; skk つかっているときの終了がやや遅いのを改善する
+;; ;; ; https://note.com/twofaults/n/nf846f7b2ea12
+;; ;; (dolist (fn '(skk-save-jisyo skk-study-save))
+;; ;;  (remove-hook 'kill-emacs-hook fn)
+;; ;;  (add-hook 'kill-emacs-hook (lambda () (funcall fn t))))
 
 
+;; ;; (advice-add 'skk-study-save :around
+;; ;;             (lambda (orig-fun &rest args)
+;; ;;               (cl-letf (((symbol-function 'sit-for) (lambda (&rest _) t))
+;; ;;                         ((symbol-function 'skk-message) (lambda (&rest _) nil)))
+;; ;;                 (apply orig-fun args)))))
 
 
-; mozcの設定 
+;;; mozcの設定 
 ;; (require 'mozc)
 ;; (require 'mozc-popup) ;;
 ;; (require 'mozc-cursor-color)
@@ -609,9 +611,9 @@
 ;; (setq default-input-method "japanese-mozc")
 ;; (setq mozc-candidate-style 'popup)
 ;; ; mozc カーソルカラーを設定する
-;; (setq mozc-cursor-color-alist '((direct        . "LightYellow")
-;;                                 (read-only     . "yellow")
-;;                                 (hiragana      . "green")
+;; (setq mozc-cursor-color-alist '((direct        . "yellow")
+;;                                 (read-only     . "orange")
+;;                                 (hiragana      . "LawnGreen")
 ;;                                 (full-katakana . "goldenrod")
 ;;                                 (half-ascii    . "dark orchid")
 ;;                                 (full-ascii    . "orchid")
@@ -650,6 +652,140 @@
 ;;     (progn ;(message "%s" event) ;debug
 ;;       ad-do-it)))
 ;; (ad-activate 'mozc-handle-event)
+
+;; ; mini buffer では ime off
+;; (defvar my-saved-input-method nil)
+;; (add-hook 'minibuffer-setup-hook
+;;           (lambda ()
+;;             (setq my-saved-input-method current-input-method)
+;;             (deactivate-input-method)))
+;; (add-hook 'minibuffer-exit-hook
+;;           (lambda ()
+;;             (when my-saved-input-method
+;;               (inactivate-input-method) ; or activate-input-method depending on setup
+;;               (setq current-input-method my-saved-input-method))))
+
+;; ;; Mozcをデフォルトのインプットメソッドに設定
+;; (require 'mozc)
+;; (setq default-input-method "japanese-mozc")
+
+;; ;; 起動時にヘルパープロセスとの通信を有効化
+;; (setq mozc-candidate-style 'echo-area) ; 変換候補をミニバッファ（エコーエリア）に表示
+;; ;; キーバインドの設定 (お好みに合わせて変更してください)
+;; デフォルトの「C-\」でMozcのON/OFFを切り替える場合、設定は不要です。
+;; 例: 「C-SPC」でトグルさせたい場合
+;; (global-set-key (kbd "C-SPC") 'toggle-input-method)
+
+
+;;; fcitx5 
+(defun my-fcitx5-minibuffer-off ()
+  "ミニバッファに入ったときにIMEをオフにする"
+  (setq-local my-fcitx5-previous-state (string-to-number (shell-command-to-string "fcitx5-remote")))
+  (when (= my-fcitx5-previous-state 2) ; 2はIMEオンの状態
+    (shell-command "fcitx5-remote -c"))) ; IMEをクローズ
+
+(defun my-fcitx5-minibuffer-restore ()
+  "ミニバッファを出るときに前のIME状態を復元する"
+  (when (and (boundp 'my-fcitx5-previous-state) (= my-fcitx5-previous-state 2))
+    (shell-command "fcitx5-remote -o"))) ; IMEをオープン
+
+(add-hook 'minibuffer-setup-hook #'my-fcitx5-minibuffer-off)
+(add-hook 'minibuffer-exit-hook #'my-fcitx5-minibuffer-restore)
+
+
+(defun my-fcitx5-state ()
+  "fcitx5-remote を呼び出して現在のIME状態を取得する。
+2: ON (日本語入力), 1: OFF (英語入力)"
+  (string-to-number (shell-command-to-string "fcitx5-remote")))
+
+(defun my-update-cursor-color-by-ime ()
+  "Fcitx5の状態に応じてカーソルの色を変更する。"
+  (interactive)
+  (let ((ime-state (my-fcitx5-state)))
+    (cond
+     ((= ime-state 2)
+      (set-cursor-color "LawnGreen")) ; IME ON の時の色 (例: 緑)
+     ((= ime-state 1)
+      (set-cursor-color "White"))  ; IME OFF の時の色 (例: 白)
+     (t
+      (set-cursor-color "White")))))
+
+;; 1. コマンド実行後（キー入力後）にIMEの状態をチェックして色に反映
+(add-hook 'post-command-hook #'my-update-cursor-color-by-ime)
+;; 2. フォーカスがEmacsに戻った時にも状態を再チェック
+(add-hook 'focus-in-hook #'my-update-cursor-color-by-ime)
+
+
+(defun my/fcitx-off ()
+  "外部コマンドを使ってFcitx5を強制的にオフにする"
+  (when (executable-find "fcitx5-remote")
+    (call-process "fcitx5-remote" nil nil nil "-c")))
+
+(defun my/org-speed-key-fcitx-hook ()
+  (when (and (derived-mode-p 'org-mode)
+             (bolp)
+             (looking-at "^\\*+\\s-"))
+    (my/fcitx-off)))
+
+(add-hook 'post-command-hook #'my/org-speed-key-fcitx-hook)
+
+
+;; ;; Enable Org Speed Commands
+;; (setq org-use-speed-commands t)
+
+;; ;; Deactivate system/internal input method when entering an Org headline
+;; (add-hook 'org-speed-command-hook
+;;           (lambda ()
+;;             (when (fboundp 'deactivate-input-method)
+;;               (deactivate-input-method))
+;;             nil)) ; Return nil to let Org handle the command
+
+
+;; (use-package sis
+;;   :ensure t
+;;   :config
+;;   ;; Fcitx5を使用するための設定
+;;   (sis-ism-lazyman-config "1" "2" 'fcitx5)
+
+;;   ;; 各種バッファでの自動切り替え有効化
+;;   (sis-global-cursor-color-mode t)
+;;   (sis-global-context-mode t)
+;;   (sis-global-inline-mode t)
+
+;;     ;; 【重要】Org-modeのSpeed Command用の設定
+;;   ;; 見出しの先頭（* の位置）や特定の文脈で自動的にIMEをOFFにする
+;;   (add-hook 'org-mode-hook
+;;             (lambda ()
+;;               ;; Speed Commandを有効化
+;;               (setq org-use-speed-commands t)
+;;               ;; 独自のコンテキストルールを定義してIMEを自動OFF
+;;               (add-to-list 'sis-context-hooks
+;;                            (lambda ()
+;;                              (when (and (derived-mode-p 'org-mode)
+;;                                         (org-at-heading-p))
+;;                                (sis-set-english)))))))
+
+
+; https://github.com/heiwiper/emacs.d/blob/main/init.org
+(use-package lin
+   :ensure t)
+ 
+
+(defun sudo ()
+  "Use TRAMP to `sudo' the current buffer."
+  (interactive)
+  (when buffer-file-name
+    (find-alternate-file
+     (concat "/sudo:root@localhost:"
+             buffer-file-name))))
+
+(defun sudo-find-file (file)
+       "Open FILE as root."
+       (interactive
+        (list (read-file-name "Open as root: ")))
+       (find-file (if (file-writable-p file)
+                      file
+                    (concat "/sudo:root@localhost:" file))))
 
 
 ;.20. warning
@@ -1004,6 +1140,18 @@
   (with-eval-after-load 'highlight-indent-guides
     (setq highlight-indent-guides-responsive 'stack)
     (setq highlight-indent-guides-method 'bitmap)))
+
+
+; https://github.com/tarsius/cond-let/  magit require this.
+(eval-when-compile
+  (el-clone :repo "tarsius/cond-let"))
+
+(with-delayed-execution
+  (message "Install cond-let...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/cond-let"))
+  (autoload-if-found '(cond-let) "cond-let")
+)
+
 
 ;.4.3. hl-todo
 (eval-when-compile
@@ -2382,7 +2530,6 @@
 
 
 ;.37.12. nyan-mode
-
 (eval-when-compile
   (el-clone :repo "TeMPOraL/nyan-mode"))
 
@@ -2396,7 +2543,6 @@
     (setq nyan-animation-frame-interval 1)
     (setq nyan-bar-length 18)
     (setq nyan-animate-nyancat t)))
-
 
 
 ;.41.12. restclient
@@ -3175,6 +3321,7 @@ Return minutes (number)."
   (setq migemo-regex-dictionary nil)
   (setq migemo-coding-system 'utf-8-unix)
   (setq migemo-command "cmigemo")
+                                        ;(setq migemo-dictionary "/usr/share/cmigemo/utf-8/migemo-dict")
   (setq migemo-dictionary "/usr/share/cmigemo/utf-8/migemo-dict")
   (setq migemo-use-pattern-alist t)
   (setq migemo-use-frequent-pattern-alist t)
@@ -3613,18 +3760,6 @@ This needs more work, to handle headings with lots of spaces in them."
 )
 
 
-
-; https://github.com/tarsius/cond-let/  magit require this.
-(eval-when-compile
-  (el-clone :repo "tarsius/cond-let"))
-
-(with-delayed-execution
-  (message "Install cond-let...")
-  (add-to-list 'load-path (locate-user-emacs-file "el-clone/cond-let"))
-  (autoload-if-found '(cond-let) "cond-let")
-)
-
-
 ; magit
 (eval-when-compile
   (el-clone :repo "magit/magit"))
@@ -3851,15 +3986,29 @@ The DWIM behaviour of this command is as follows:
 
 
 ; pacman
-(eval-when-compile
-   (el-clone :repo "emacsmirror/pacmacs"))
- (with-delayed-execution
-   (message "Install pacmacs...")
-   (add-to-list 'load-path (locate-user-emacs-file "el-clone/pacmacs"))
-   (autoload-if-found '(pacmacs-start) "pacmacs" nil t)
-   )
+;; (eval-when-compile
+;;    (el-clone :repo "emacsmirror/pacmacs"))
+;;  (with-delayed-execution
+;;    (message "Install pacmacs...")
+;;    (add-to-list 'load-path (locate-user-emacs-file "el-clone/pacmacs"))
+;;    (autoload-if-found '(pacmacs-start) "pacmacs" nil t)
+;;    )
 
+;https://github.com/Daskeladden/canvas-minimap
+;; (eval-when-compile
+;;   (el-clone :repo "Daskeladden/canvas-minimap"))
 
+;; (with-delayed-execution
+;;   (message "Install canvas-minimap...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/canvas-minimap"))
+;;   (autoload-if-found '(canvas-minimap-mode) "canvas-minimap" nil t)
+;;   (canvas-minimap-mode 1))
+
+; high performance terminal in emacs
+(require 'vterm)
+(setq vterm-max-scrollback. 10000)
+(setq vterm-buffer-name-string "vterm: %s")
+(setq vterm-keymap-exceptions '("C-c" "C-x" "<f1>" "<f2>" "<f4>"))
 
 ; ---------------------------------------------
 (global-set-key (kbd "C-/") 'lines-comment)
@@ -3886,7 +4035,7 @@ The DWIM behaviour of this command is as follows:
 ; adust U F17
 ;(global-set-key (kbd "<XF86Launch8>") 'mode-line-other-buffer)
 (global-set-key (kbd "<XF86Launch8>") 'other-window)
-
+(global-set-key (kbd "<Launch8>") 'other-window)
 
 (global-set-key (kbd "<S-f2>") 'delete-window )
 (global-set-key (kbd "<S-f3>") 'split-window-horizontally)
@@ -3944,8 +4093,9 @@ The DWIM behaviour of this command is as follows:
 (setq split-height-threshold nil)
 
 
-(require 'rtags)
-(setq rtags-path "~/rtags/bin")
+;; https://github.com/andersbakken/rtags
+;(require 'rtags)
+;(setq rtags-path "~/rtags/bin")
 
 
 ;;;https://github.com/kiwanami/emacs-ctable
@@ -4297,5 +4447,12 @@ The DWIM behaviour of this command is as follows:
   (setq-local face-remapping-alist '((default :height 1.0))))
 
 (add-hook 'minibuffer-setup-hook #'my-set-minibuffer-font-size)
+
+
+(use-package org-timegrid
+  :vc (:url "https://github.com/Gleek/org-timegrid.git")
+  :commands (org-timegrid-week)
+  :bind ("C-c c" . org-timegrid-week))
+
 
 (message "init.el end.")
