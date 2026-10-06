@@ -1,4 +1,4 @@
-;. early-init.el
+;. early-init.el  -*- lexical-binding: t; nil
 ;.1. Header
 
 ;; early-init.el --- My early-init.el -*- lexical-binding: t -*-
@@ -14,6 +14,8 @@
 
 ;.4. スタートアップメッセージを非表示
 (setq inhibit-startup-message t)
+
+;(elisp-enable-lexical-binding)
 
 ;.5. 自動生成ファイルを無効にする
 (setq make-backup-files nil)
@@ -84,3 +86,9 @@
 ;; Set part of theme at startup
 (custom-set-faces
  '(default ((t (:background "#282a36" :foreground "#f8f8f2")))))
+
+;; すべての新しいフレームを半透明にする場合（例：透過度92%）
+(add-to-list 'default-frame-alist '(alpha-background . 92))
+;; 現在のフレームにすぐ適用する場合
+;; (set-frame-parameter nil 'alpha-background 92)
+

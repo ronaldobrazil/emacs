@@ -354,8 +354,8 @@
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
  '(package-selected-packages
-   '(consult-lsp doom-modeline lin lsp-ui solarized-theme spaceline
-                 spacemacs-theme zenburn-theme zig-mode))
+   '(consult-lsp doom-modeline lin lsp-ui pdf-tools solarized-theme
+                 spaceline spacemacs-theme zenburn-theme zig-mode))
  '(package-vc-selected-packages '((nskk :url "https://github.com/takeokunn/nskk.el")))
  '(savehist-additional-variables '(kill-ring))
  '(warning-suppress-types '((comp))))
@@ -766,10 +766,30 @@
 ;;                                (sis-set-english)))))))
 
 
-; https://github.com/heiwiper/emacs.d/blob/main/init.org
+;; ; https://github.com/heiwiper/emacs.d/blob/main/init.org
+;; (use-package lin
+;;    :ensure t
+;;    :config
+;;    ;; (lin-face 'lin-blue) ; check doc string for alternative styles 
+;;    ;; You can use this to live update the face:
+;;    ;; (customize-set-variable 'lin-face 'lin-green)
+;;    (lin-global-mode 1))
+
 (use-package lin
-   :ensure t)
- 
+  :ensure t
+  :config
+  (setopt lin-face 'lin-blue) ; check docstring for alternative styles
+  
+  (lin-global-mode 1)
+
+  ;; If you are using the GNOME desktop and want to synchronise the
+  ;; `lin-face' with GNOME's accent colour:
+  (lin-gnome-accent-color-mode 1))
+
+(use-package pdf-tools
+  :ensure t
+  :config
+  (pdf-tools-install))
 
 (defun sudo ()
   "Use TRAMP to `sudo' the current buffer."
@@ -786,6 +806,34 @@
        (find-file (if (file-writable-p file)
                       file
                     (concat "/sudo:root@localhost:" file))))
+
+
+
+;; (use-package ghostel
+;;   :ensure t
+;;   :bind (("C-x m" . ghostel)
+;;          :map ghostel-semi-char-mode-map
+;;          ("C-s"  . consult-line)
+;;          ("C-k"  . my/ghostel-send-C-k-and-kill)
+;;          ;; I'm used to go up/down the shell history with M-n/p from eshell
+;;          ;; Simulate this behavior in ghostel by sending C-p and C-n
+;;          ("M-p" . (lambda () (interactive) (ghostel-send-key "p" "ctrl")))
+;;          ("M-n" . (lambda () (interactive) (ghostel-send-key "n" "ctrl")))
+;;          :map project-prefix-map
+;;          ("m" . ghostel-project)
+;;          ("M" . ghostel-project-list-buffers))
+;;   :config
+;;   (defun my/ghostel-send-C-k-and-kill ()
+;;     "Send `C-k' to ghostel.
+;; Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
+;;     (interactive)
+;;     (kill-ring-save (point) (line-end-position))
+;;     (ghostel-send-key "k" "ctrl"))
+
+;;   (add-to-list 'project-switch-commands '(ghostel-project "Ghostel") t)
+;;   (add-to-list 'project-switch-commands '(ghostel-project-list-buffers "Ghostel buffers") t)
+;;   (add-to-list 'ghostel-eval-cmds '("magit-status-setup-buffer" magit-status-setup-buffer)))
+
 
 
 ;.20. warning
@@ -4240,9 +4288,6 @@ The DWIM behaviour of this command is as follows:
   "Initialize fonts on window-system"
   (interactive)
 
-  (cond
-   ( (eq window-system 'pgtk)
-    ; (eq window-system 'x)
     (let* ((size 12)
            (asciifont "Cica")
            (jpfont "Cica")
@@ -4259,8 +4304,7 @@ The DWIM behaviour of this command is as follows:
         (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-octicon-family)) nil 'append)
         (set-fontset-font nil 'unicode (font-spec :family (all-the-icons-wicon-family)) nil 'append))
       (message (format "Setup for %s with %f" asciifont size))))
-   (t
-    (message "Not have window-system"))))
+   
 
 ; font 設定を反映
 (my:font-initialize)
@@ -4275,7 +4319,7 @@ The DWIM behaviour of this command is as follows:
 
 (global-corfu-mode)
 (setq corfu-auto t)
-(setq corfu-auto-delay 0.2)
+(setq corfu-auto-delay 0.1)
 (setq corfu-auto-prefix 2)
     (setq corfu-cycle t)
     (require 'corfu-popupinfo)
