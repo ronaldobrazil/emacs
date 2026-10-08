@@ -354,8 +354,9 @@
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
  '(package-selected-packages
-   '(consult-lsp doom-modeline lin lsp-ui pdf-tools solarized-theme
-                 spaceline spacemacs-theme zenburn-theme zig-mode))
+   '(consult-lsp doom-modeline lin lsp-ui pdf-tools recentf-ext
+                 solarized-theme spaceline spacemacs-theme
+                 zenburn-theme zig-mode))
  '(package-vc-selected-packages '((nskk :url "https://github.com/takeokunn/nskk.el")))
  '(savehist-additional-variables '(kill-ring))
  '(warning-suppress-types '((comp))))
@@ -729,6 +730,18 @@
 
 (add-hook 'post-command-hook #'my/org-speed-key-fcitx-hook)
 
+
+;; ;; Ctrl-x が押されたらIMEをオフにする
+;; (define-key key-translation-map (kbd "C-x")
+;;   (lambda (prompt)
+;;     (my/fcitx-off)
+;;     (kbd "C-x")))
+
+;; ;; Ctrl-c が押されたらIMEをオフにする
+;; (define-key key-translation-map (kbd "C-c")
+;;   (lambda (prompt)
+;;     (my/fcitx-off)
+;;     (kbd "C-c")))
 
 ;; ;; Enable Org Speed Commands
 ;; (setq org-use-speed-commands t)
@@ -1556,6 +1569,12 @@
     (setq recentf-auto-save-timer (run-with-idle-timer 30 t 'recentf-save-list))
     (setq recentf-exclude '("recentf" "\\.gpg\\"))))
 
+; recentf-ext https://github.com/casouri/lunarymacs/tree/master/site-lisp
+(use-package recentf-ext
+  :ensure t
+  :after recentf
+  :config
+  (recentf-mode 1))
 
 ;.21.3. which-key 例えば C-x して1秒待つと2stroke 候補を表示.
 (eval-when-compile
@@ -3715,6 +3734,7 @@ This needs more work, to handle headings with lots of spaces in them."
     (setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
         fzf/executable "fzf"
         fzf/git-grep-args "-i --line-number %s"
+        fzf/directory-start-args "-A --hidden"
         ;; command used for `fzf-grep-*` functions
         ;; example usage for ripgrep:
         ;; fzf/grep-command "rg --no-heading -nH"
@@ -4313,6 +4333,7 @@ The DWIM behaviour of this command is as follows:
 ; 補完(completion)をemacs 30以降の標準completionを止め、
 ; corfu,cape,orderless,prescient で動かすための関数とhook
 (defun my:reconfcomp ()
+    (interactive)
 (require 'affe)
 (setq completion-auto-help nil)
 (my/yasnippet-capf-h)
@@ -4363,6 +4384,16 @@ The DWIM behaviour of this command is as follows:
                         ;:sort t
                         :exclusive 'no
                         ))))))
+
+    ; dabbrev 範囲をバッファ内だけにする
+    ; (setq cape-dabbrev-check-other-buffers nil)
+    ; すべてのバッファ対象
+    ; (setq cape-dabbrev-buffer-function #'cape-dabbrev-buffers-all)
+    ; 同一モードバッファだけ対象
+    ; (setq cape-dabbrev-buffer-function #'cape-dabbrev-buffers-major-mode)
+
+    ; 何文字以上入力した時点で cape-dabbrev の検索・補完対象にするか
+    ; (setq cape-dabbrev-min-length 4)
 
     (my/set-super-capf)
     ;; 候補が少なければTABで巡回
