@@ -209,9 +209,6 @@
   (with-eval-after-load 'minibuffer
     (add-hook 'minibuffer-inactive-mode-hook #'my/disable-show-trailing-whitespace))
 
-  (with-eval-after-load 'dashboard
-    (add-hook 'dashboard-mode-hook #'my/disable-show-trailing-whitespace))
-
   (with-eval-after-load 'simple
     (add-hook 'fundamental-mode-hook #'my/disable-show-trailing-whitespac))
   )
@@ -241,16 +238,16 @@
   (setq eval-expression-print-length nil)
   (setq eval-expression-print-level nil)
 
-  (add-hook 'org-mode-hook 'prettify-symbols-mode)
-  (setq-default prettify-symbols-alist '((":PROPERTIES:" . "»")
-                                       (":LOGBOOK:" . "›")
-                                       (":END:" . "›")
-                                       ("#+begin_src" . "▨")
-                                       ("#+end_src" . "▨")
-                                       ("#+RESULTS:" . "▨")
-                                       ("[ ]" .  "☐")
-                                       ("[X]" . "☑" )
-                                       ("[-]" . "☒" )))
+;;   (add-hook 'org-mode-hook 'prettify-symbols-mode)
+;;   (setq-default prettify-symbols-alist '((":PROPERTIES:" . "»")
+;;                                        (":LOGBOOK:" . "›")
+;;                                        (":END:" . "›")
+;;                                        ("#+begin_src" . "▨")
+;;                                        ("#+end_src" . "▨")
+;;                                        ("#+RESULTS:" . "▨")
+;;                                        ("[ ]" .  "☐")
+;;                                        ("[X]" . "☑" )
+;;                                        ("[-]" . "☒" )))
 )
 
 
@@ -788,16 +785,16 @@
 ;;    ;; (customize-set-variable 'lin-face 'lin-green)
 ;;    (lin-global-mode 1))
 
-(use-package lin
-  :ensure t
-  :config
-  (setopt lin-face 'lin-blue) ; check docstring for alternative styles
+;; (use-package lin
+;;   :ensure t
+;;   :config
+;;   (setopt lin-face 'lin-blue) ; check docstring for alternative styles
   
-  (lin-global-mode 1)
+;;   (lin-global-mode 1)
 
-  ;; If you are using the GNOME desktop and want to synchronise the
-  ;; `lin-face' with GNOME's accent colour:
-  (lin-gnome-accent-color-mode 1))
+;;   ;; If you are using the GNOME desktop and want to synchronise the
+;;   ;; `lin-face' with GNOME's accent colour:
+;;   (lin-gnome-accent-color-mode 1))
 
 (use-package pdf-tools
   :ensure t
@@ -1213,6 +1210,22 @@
   (autoload-if-found '(cond-let) "cond-let")
 )
 
+;.37.5. dimmer
+(eval-when-compile
+  (el-clone :repo "gonewest818/dimmer.el"))
+
+(with-eval-after-load 'dimmer
+  (message "Install dimmer...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/dimmer"))
+
+  (autoload-if-found '(dimmer-configure-which-key
+                       dimmer-configure-org
+                       dimmer-mode)
+                     "dimmer" nil t)
+
+  (dimmer-configure-which-key)
+  (dimmer-configure-org)
+  (dimmer-mode t))
 
 ;.4.3. hl-todo
 (eval-when-compile
@@ -1230,11 +1243,11 @@
     (setq hl-todo-keyword-faces
           '(("HOLD" . "#d0bf8f")
             ("TODO" . "#cc9393")
-            ("NOW" . "#dca3a3")
+            ("NEXT" . "#ff1493")
             ("SOMEDAY" . "#bfd9bf")
             ("WAIT" . "#7cb8bb")
             ("DONE" . "#afd8af")
-            ("FIXME" . "#cc9393")))))
+            ("CANCEL" . "#a9a9a9")))))
 
 
 ;.swiper
@@ -1571,7 +1584,7 @@
 
 ; recentf-ext https://github.com/casouri/lunarymacs/tree/master/site-lisp
 (use-package recentf-ext
-  :ensure t
+  ;:ensure t
   :after recentf
   :config
   (recentf-mode 1))
@@ -2576,26 +2589,6 @@
 ;;                              (agenda . 5)))
 ;; (dashboard-setup-startup-hook)
 
-
-
-;.37.5. dimmer
-(eval-when-compile
-  (el-clone :repo "gonewest818/dimmer.el"))
-
-(with-eval-after-load 'dimmer
-  (message "Install dimmer...")
-  (add-to-list 'load-path (locate-user-emacs-file "el-clone/dimmer"))
-
-  (autoload-if-found '(dimmer-configure-which-key
-                       dimmer-configure-org
-                       dimmer-mode)
-                     "dimmer" nil t)
-
-  (dimmer-configure-which-key)
-  (dimmer-configure-org)
-  (dimmer-mode t))
-
-
 ;.37.12. nyan-mode
 (eval-when-compile
   (el-clone :repo "TeMPOraL/nyan-mode"))
@@ -2800,9 +2793,12 @@
   (setq org-todo-keyword-faces
       '(
       ("TODO" . org-warning)
+      ("NEXT" . "DeepPink")
       ("WAIT" . "PaleGreen")
       ("SOMEDAY" . "OliveDrab")
-      ("DONE" . "LightSlateGray")))
+      ("DONE" . "LightSlateGray")
+      ("CANCEL" . "DarkGray")
+))
       
 ; https://sachachua.com/blog/2012/12/emacs-strike-through-headlines-for-done-tasks-in-org/
 (setq org-fontify-done-headline t)
@@ -2839,7 +2835,7 @@
   (add-to-list 'org-speed-commands '("j" call-interactively #'consult-org-heading))
   
   ;; todo
-  (setq org-todo-keywords '((sequence "TODO(t)" "SOMEDAY(s)" "WAIT(w)" "|" "DONE(d)")))
+  (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "SOMEDAY(s)" "WAIT(w)" "|" "DONE(d)" "CANCEL(c)")))
 
   ;; startup
   (setq org-startup-folded 'show3levels)
@@ -2882,12 +2878,19 @@
             
       ;(shell-command (concat "pngpaste " filename))
                                         ;(shell-command (concat "xclip -selection clipboard -o > " filename))
-      (shell-command (concat (concat "scrot -s '" filename) "'"))
+      ; (shell-command (concat (concat "scrot -s '" filename) "'"))
+      ; for wayland
+      (shell-command (format "grim -g \"$(slurp)\" \"%s\"" filename))
+
       (if (file-exists-p filename)
           (insert (concat "[[file:" filename "]]")))
       (org-display-inline-images)))
 
   (global-set-key (kbd "C-M-y") 'org-insert-clipboard-image);)
+
+  (setq org-yank-image-save-type 'png)
+  (setq org-yank-image-dir "./images/")
+
   )
 
 
@@ -3129,14 +3132,17 @@
   (with-eval-after-load 'org-super-agenda
     (setq org-super-agenda-groups '((:log t)
                                     (:auto-group t)
+                                    (:auto-priority t)
                                     (:auto-outline-path t)
                                     (:name "Today List..." :scheduled today)
                                     (:name "Due Today List..." :deadline today)
                                     (:name "Overdue List..." :deadline past)
                                     (:name "Due Soon List" :deadline future)
                                     (:name "TODO List..." :todo "TODO")
+                                    (:name "NEXT List..." :todo "NEXT")
                                     (:name "WAIT List..." :todo "WAIT")
                                     (:name "DONE List..." :todo "DONE")
+                                    (:name "CANCEL List..." :todo "CANCEL")
                                     (:name "SOMEDAY List..." :todo "SOMEDAY")))
 
   (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t%-6e% s")
@@ -4077,6 +4083,11 @@ The DWIM behaviour of this command is as follows:
 (setq vterm-max-scrollback. 10000)
 (setq vterm-buffer-name-string "vterm: %s")
 (setq vterm-keymap-exceptions '("C-c" "C-x" "<f1>" "<f2>" "<f4>"))
+(defun my:vterm ()
+  (interactive)
+  (split-window-vertically)
+  (vterm))
+
 
 ; ---------------------------------------------
 (global-set-key (kbd "C-/") 'lines-comment)

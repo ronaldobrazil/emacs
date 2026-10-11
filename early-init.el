@@ -13,7 +13,7 @@
 (push '(tool-bar-lines . 0) default-frame-alist)
 
 ;.4. スタートアップメッセージを非表示
-(setq inhibit-startup-message t)
+;(setq inhibit-startup-message t)
 
 ;(elisp-enable-lexical-binding)
 
