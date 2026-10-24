@@ -351,10 +351,13 @@
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
  '(package-selected-packages
-   '(consult-lsp doom-modeline lin lsp-ui pdf-tools recentf-ext
-                 solarized-theme spaceline spacemacs-theme
-                 zenburn-theme zig-mode))
- '(package-vc-selected-packages '((nskk :url "https://github.com/takeokunn/nskk.el")))
+   '(consult-lsp doom-modeline eat fcitx gemini-cli lin lsp-ui pdf-tools
+                 popup projectile recentf-ext solarized-theme
+                 spaceline spacemacs-theme vterm zenburn-theme
+                 zig-mode))
+ '(package-vc-selected-packages
+   '((gemini-cli :url "https://github.com/linchen2chris/gemini-cli.el")
+     (nskk :url "https://github.com/takeokunn/nskk.el")))
  '(savehist-additional-variables '(kill-ring))
  '(warning-suppress-types '((comp))))
 
@@ -674,8 +677,8 @@
 ;; 例: 「C-SPC」でトグルさせたい場合
 ;; (global-set-key (kbd "C-SPC") 'toggle-input-method)
 
-
-;;; fcitx5 
+;;;;; 
+;; ;;; fcitx5 
 (defun my-fcitx5-minibuffer-off ()
   "ミニバッファに入ったときにIMEをオフにする"
   (setq-local my-fcitx5-previous-state (string-to-number (shell-command-to-string "fcitx5-remote")))
@@ -714,18 +717,18 @@
 (add-hook 'focus-in-hook #'my-update-cursor-color-by-ime)
 
 
-(defun my/fcitx-off ()
-  "外部コマンドを使ってFcitx5を強制的にオフにする"
-  (when (executable-find "fcitx5-remote")
-    (call-process "fcitx5-remote" nil nil nil "-c")))
+;; (defun my/fcitx-off ()
+;;   "外部コマンドを使ってFcitx5を強制的にオフにする"
+;;   (when (executable-find "fcitx5-remote")
+;;     (call-process "fcitx5-remote" nil nil nil "-c")))
 
-(defun my/org-speed-key-fcitx-hook ()
-  (when (and (derived-mode-p 'org-mode)
-             (bolp)
-             (looking-at "^\\*+\\s-"))
-    (my/fcitx-off)))
+;; (defun my/org-speed-key-fcitx-hook ()
+;;   (when (and (derived-mode-p 'org-mode)
+;;              (bolp)
+;;              (looking-at "^\\*+\\s-"))
+;;     (my/fcitx-off)))
 
-(add-hook 'post-command-hook #'my/org-speed-key-fcitx-hook)
+;; (add-hook 'post-command-hook #'my/org-speed-key-fcitx-hook)
 
 
 ;; ;; Ctrl-x が押されたらIMEをオフにする
@@ -739,6 +742,23 @@
 ;;   (lambda (prompt)
 ;;     (my/fcitx-off)
 ;;     (kbd "C-c")))
+
+;; ;; F6 が押されたらIMEをオフにする
+;; (define-key key-translation-map (kbd "<f6>")
+;;   (lambda (prompt)
+;;     (my/fcitx-off)
+;;     (kbd "<f6>")))
+;;;;; 
+
+(use-package fcitx
+  ;:ensure t
+  :config
+  ;; D-Bus を使う設定 (Fcitx5 の場合も t または 'fcitx5)
+  (setq fcitx-use-dbus t)
+  ;;; 標準的なセットアップを有効化
+  ;;(fcitx-default-setup)
+  (fcitx-aggressive-setup)
+)
 
 ;; ;; Enable Org Speed Commands
 ;; (setq org-use-speed-commands t)
@@ -2848,7 +2868,7 @@
 
   (defvar my/org-agenda-files `(,(concat org-directory "/AI.org")
                                 ,(concat org-directory "/personal.org")
-                                ,(concat org-directory "/notes.org")))
+                                ,(concat org-directory "/todo.org")))
 
   (setq org-agenda-files my/org-agenda-files)
   (setq org-archive-location `,(format (expand-file-name "archive/%s/%s.org::* Archived Tasks" org-directory)
@@ -2988,6 +3008,15 @@
  (setq org-journal-file-header 'org-journal-file-header-func)
 (org-journal-new-entry t))
 (global-set-key (kbd "C-c j") 'my/org-journal-open)
+
+(defun my/org-journal-insert-template ()
+  "Insert a template from an external file into a new journal entry."
+  (interactive)
+  (let ((template-file "~/Dropbox/template.org"))
+    (when (and (file-exists-p template-file)
+               (< (buffer-size) 50)) ; Insert only if the file is poor
+      (insert-file-contents template-file))))
+(add-hook 'org-journal-after-entry-create-hook #'my/org-journal-insert-template)
 
 
 
@@ -4539,6 +4568,44 @@ The DWIM behaviour of this command is as follows:
   :vc (:url "https://github.com/Gleek/org-timegrid.git")
   :commands (org-timegrid-week)
   :bind ("C-c c" . org-timegrid-week))
+
+
+;; (use-package gptel
+;;   :ensure t
+;;   :config
+;;   (setq gptel-backend
+;;         (gptel-make-gemini "Gemini"
+;;           :key "AQ.Ab8RN6JRqMrIPMplmhDBGOF0MQaoCJytLWS1NW8DjKoup1igCg"
+;;           :stream t))
+;;   (setq gptel-model 'gemini-2.5-flash))
+
+;; add melp to package archives, as vterm is on melpa:
+;(require 'package)
+;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;(package-initialize)
+
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-command-map
+         ("s-p" . projectile-command-map)
+         ("C-c p" . projectile-command-map)))
+
+;; ;; for eat terminal backend:
+;; (use-package eat :ensure t)
+
+;; ;; for vterm terminal backend:
+;; (use-package vterm :ensure t)
+;; ;; for slash commands popup
+;; (use-package popup :ensure t)
+;; ;; install gemini-cli.el
+;; (use-package gemini-cli :ensure t
+;;   :vc (:url "https://github.com/linchen2chris/gemini-cli.el" :rev :newest)
+;;   :config
+;;   (gemini-cli-mode)
+;;   (gemini-cli-terminal-backend 'vterm)
+;;   :bind-keymap ("C-c c" . gemini-cli-command-map)) ;; or your preferred key
 
 
 (message "init.el end.")
