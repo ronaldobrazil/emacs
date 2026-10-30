@@ -4593,19 +4593,6 @@ The DWIM behaviour of this command is as follows:
   :bind ("C-c c" . org-timegrid-week))
 
 
-;; (use-package gptel
-;;   :ensure t
-;;   :config
-;;   (setq gptel-backend
-;;         (gptel-make-gemini "Gemini"
-;;           :key "AQ.Ab8RN6JRqMrIPMplmhDBGOF0MQaoCJytLWS1NW8DjKoup1igCg"
-;;           :stream t))
-;;   (setq gptel-model 'gemini-2.5-flash))
-
-;; add melp to package archives, as vterm is on melpa:
-;(require 'package)
-;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;(package-initialize)
 
 (use-package projectile
   :ensure t
