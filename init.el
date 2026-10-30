@@ -351,10 +351,10 @@
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
  '(package-selected-packages
-   '(consult-lsp doom-modeline eat fcitx gemini-cli lin lsp-ui pdf-tools
-                 popup projectile recentf-ext solarized-theme
-                 spaceline spacemacs-theme vterm zenburn-theme
-                 zig-mode))
+   '(consult-lsp copilot doom-modeline eat fcitx gemini-cli lin lsp-ui
+                 pdf-tools popup projectile recentf-ext
+                 solarized-theme spaceline spacemacs-theme vterm
+                 zenburn-theme zig-mode))
  '(package-vc-selected-packages
    '((gemini-cli :url "https://github.com/linchen2chris/gemini-cli.el")
      (nskk :url "https://github.com/takeokunn/nskk.el")))
@@ -3365,6 +3365,28 @@ Return minutes (number)."
                                  (shell . t))))
 
 
+; https://github.com/tkf/emacs-request (for emacs-websearch)
+(eval-when-compile
+  (el-clone :repo "tkf/emacs-request"))
+(with-delayed-execution
+  (message "Install request...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/emacs-request"))
+  (autoload-if-found '(request) "request" nil t))
+
+
+; https://github.com/zhenhua-wang/emacs-websearch
+(eval-when-compile
+  (el-clone :repo "zhenhua-wang/emacs-websearch"))
+(with-delayed-execution
+  (message "Install emacs-websearch...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/emacs-websearch"))
+  (autoload-if-found '(emacs-websearch) "emacs-websearch" nil t)
+  (setq emacs-websearch-async t)
+  ; default DuckDuckGo
+  (setq emacs-websearch-engine 'google))
+
+
+
 ; highlight-symbol
 (eval-when-compile
   (el-clone :repo "nschum/highlight-symbol.el"))
@@ -4169,6 +4191,7 @@ The DWIM behaviour of this command is as follows:
 (global-set-key (kbd "M-,") 'beginning-of-buffer)
 (global-set-key (kbd "M-.") 'end-of-buffer)
 
+(global-set-key (kbd "M-g M-i") 'emacs-websearch)
 
 ;; カーソル下のシンボルを拾ってconsult-line発動
 (defun consult-line-symbol-at-point (&optional at-point)
@@ -4607,5 +4630,21 @@ The DWIM behaviour of this command is as follows:
 ;;   (gemini-cli-terminal-backend 'vterm)
 ;;   :bind-keymap ("C-c c" . gemini-cli-command-map)) ;; or your preferred key
 
+
+;(use-package copilot
+;  :ensure t
+;  :hook (prog-mode . copilot-mode) ; プログラミングモードで自動有効化
+;  :bind (:map copilot-completion-map
+;              ("<tab>" . copilot-accept-completion)
+;              ("TAB" . copilot-accept-completion)))
+;(setenv "COPILOT_AGENT_TARGET" "linux-x64")
+
+;; 外部画像コンバーターを使う
+(setq image-use-external-converter t)
+;; ImageMagickを画像コンバーターとして指定
+(setq image-converter 'imagemagick)
+;; 拡張子を登録（必要に応じて追加）
+(add-to-list 'image-type-file-name-regexps '("\\.heic\\'" . imagemagick))
+(add-to-list 'image-type-file-name-regexps '("\\.heif\\'" . imagemagick))
 
 (message "init.el end.")

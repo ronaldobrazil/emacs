@@ -94,3 +94,4 @@
 ;; 現在のフレームにすぐ適用する場合
 ;; (set-frame-parameter nil 'alpha-background 92)
 
+
