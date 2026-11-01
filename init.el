@@ -351,10 +351,10 @@
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
  '(package-selected-packages
-   '(consult-lsp copilot doom-modeline eat fcitx gemini-cli lin lsp-ui
-                 pdf-tools popup projectile recentf-ext
-                 solarized-theme spaceline spacemacs-theme vterm
-                 zenburn-theme zig-mode))
+   '(company consult-lsp copilot doom-modeline fcitx flycheck
+             gemini-cli lin lsp-mode lsp-ui lspce pdf-tools popup
+             projectile recentf-ext solarized-theme spaceline
+             spacemacs-theme vterm zenburn-theme zig-mode))
  '(package-vc-selected-packages
    '((gemini-cli :url "https://github.com/linchen2chris/gemini-cli.el")
      (nskk :url "https://github.com/takeokunn/nskk.el")))
@@ -731,24 +731,27 @@
 ;; (add-hook 'post-command-hook #'my/org-speed-key-fcitx-hook)
 
 
-;; ;; Ctrl-x が押されたらIMEをオフにする
-;; (define-key key-translation-map (kbd "C-x")
-;;   (lambda (prompt)
-;;     (my/fcitx-off)
-;;     (kbd "C-x")))
+;; Ctrl-x が押されたらIMEをオフにする
+(define-key key-translation-map (kbd "C-x")
+  (lambda (prompt)
+    ;(my/fcitx-off)
+    (my-fcitx5-minibuffer-off)
+    (kbd "C-x")))
 
-;; ;; Ctrl-c が押されたらIMEをオフにする
-;; (define-key key-translation-map (kbd "C-c")
-;;   (lambda (prompt)
-;;     (my/fcitx-off)
-;;     (kbd "C-c")))
+;; Ctrl-c が押されたらIMEをオフにする
+(define-key key-translation-map (kbd "C-c")
+  (lambda (prompt)
+    ;(my/fcitx-off)
+    (my-fcitx5-minibuffer-off)
+    (kbd "C-c")))
 
-;; ;; F6 が押されたらIMEをオフにする
-;; (define-key key-translation-map (kbd "<f6>")
-;;   (lambda (prompt)
-;;     (my/fcitx-off)
-;;     (kbd "<f6>")))
-;;;;; 
+;;F6 が押されたらIMEをオフにする
+(define-key key-translation-map (kbd "<f6>")
+  (lambda (prompt)
+    ;(my/fcitx-off)
+    (my-fcitx5-minibuffer-off)
+    (kbd "<f6>")))
+
 
 (use-package fcitx
   ;:ensure t
@@ -817,7 +820,7 @@
 ;;   (lin-gnome-accent-color-mode 1))
 
 (use-package pdf-tools
-  :ensure t
+  ;:ensure t
   :config
   (pdf-tools-install))
 
@@ -980,9 +983,13 @@
   (add-to-list 'load-path (locate-user-emacs-file "el-clone/powerline")))
 
 ;.4. c++-mode
-
 (with-eval-after-load 'c++-mode
-  (add-hook 'c++-mode-hook #'lsp-bridge-mode))
+  ;(add-hook 'c++-mode-hook #'lsp-bridge-mode)
+;; C / C++ モードで自動的に Eglot を起動する設定
+  ;(require 'eglot)
+  ;(add-hook 'c-mode-hook 'eglot-ensure)
+  ;(add-hook 'c++-mode-hook 'eglot-ensure)
+)
 
 ;.5. c-mode
 
@@ -997,9 +1004,15 @@
 ;(eval-when-compilex
 ;  (el-clone :repo "flymake/emacs-flymake/blob/master"))
 
-;(with-delayed-execution
-;  (message "Install flymake...")
-;  (add-to-list 'load-path (locate-user-emacs-file "el-clone/flymake")))
+
+; https://github.com/flymake/emacs-flymake/
+;; (eval-when-compile
+;;   (el-clone :repo "flymake/emacs-flymake"))
+
+;; (with-delayed-execution
+;;   (message "Install flymake...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/emacs-flymake"))
+;;   (autoload-if-found '(flymake-mode) "flymake-mode" nil t))
 
   
 ;.9. cmake-mode
@@ -1657,23 +1670,23 @@
 
 
 
-;.22.12. lsp-bridge
-(eval-when-compile
-  (el-clone :repo "manateelazycat/lsp-bridge"))
+;; ;.22.12. lsp-bridge
+;; (eval-when-compile
+;;   (el-clone :repo "manateelazycat/lsp-bridge"))
 
-(with-delayed-execution
-  (message "Install lsp-bridge...")
-  (add-to-list 'load-path (locate-user-emacs-file "el-clone/lsp-bridge"))
+;; (with-delayed-execution
+;;   (message "Install lsp-bridge...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/lsp-bridge"))
 
-  (autoload-if-found '(lsp-bridge-mode) "lsp-bridge" nil t)
+;;   (autoload-if-found '(lsp-bridge-mode) "lsp-bridge" nil t)
 
-  (with-eval-after-load 'lsp-bridge
-    ;; config
-    (setq lsp-bridge-c-lsp-server "clangd")
-    (setq acm-enable-doc t)
-    ;; keybind
-    (define-key lsp-bridge-mode-map (kbd "M-.") #'lsp-bridge-find-impl)
-    (define-key lsp-bridge-mode-map (kbd "C-c C-r") #'lsp-bridge-find-references)))
+;;   (with-eval-after-load 'lsp-bridge
+;;     ;; config
+;;     (setq lsp-bridge-c-lsp-server "clangd")
+;;     (setq acm-enable-doc t)
+;;     ;; keybind
+;;     (define-key lsp-bridge-mode-map (kbd "M-.") #'lsp-bridge-find-impl)
+;;     (define-key lsp-bridge-mode-map (kbd "C-c C-r") #'lsp-bridge-find-references)))
 
 
 ;.25. Narrowing
@@ -4633,5 +4646,39 @@ The DWIM behaviour of this command is as follows:
 ;; 拡張子を登録（必要に応じて追加）
 (add-to-list 'image-type-file-name-regexps '("\\.heic\\'" . imagemagick))
 (add-to-list 'image-type-file-name-regexps '("\\.heif\\'" . imagemagick))
+
+
+
+;; パッケージの読み込みと lsp-mode の基本設定
+(use-package lsp-mode
+  :ensure t
+  :init
+  ;; lspのキープレフィックス（デフォルトは Super-l または C-l 系など）
+  (setq lsp-keymap-prefix "c-l")
+  :hook ((c-mode . lsp)
+         (c-mode-hook . lsp)
+         (c++-mode . lsp)
+         (c++-mode-hook . lsp))
+  :commands (lsp lsp-deferred))
+
+;; 補完フロントエンド company-mode の設定
+(use-package company
+  :ensure t
+  :hook c++-mode
+  :config
+  (global-company-mode t))
+
+;; エラーチェック flycheck の設定
+(use-package flycheck
+  :ensure t
+  :hook c++-mode
+  :init (global-flycheck-mode))
+
+;; UI拡張（ホバー情報やブレッドクラム等）
+(use-package lsp-ui
+  :ensure t
+  :hook c++-mode
+  :commands lsp-ui-mode)
+
 
 (message "init.el end.")
