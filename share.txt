@@ -16,213 +16,817 @@ tortoise git
 winmerge
 
 
----------
-https://qiita.com/mhatta/items/6914b6213e6d6e92fcd6
+* TODO 保守制御のアーキテクチャ土台を作る model 部分
+  [[file:/home/bito/copilot-linux-x64/main.cpp]]
+** Design
+*** 階層、属性、分類
+Observe_type
+  Observe
+  Non-Observe
+  Non-Implement
 
-~/.emacs.d/
-├── init.el
-└── site-lisp/
-    ├── swiper/        (ivy.el, counsel.el, swiper.el など)
-    ├── org-super-agenda/
-    ├── dash/
-    ├── s/
-    ├── ht/
-    └── ts/
+area : grouping, Observe_type
+zone : grouping, Observe_type
 
-;; =====================================================================
-;; 1. ロードパス（Load Path）の追加
-;; =====================================================================
-;; site-lisp とそのサブディレクトリをすべてロードパスに追加する関数
-(let ((default-directory (expand-file-name "~/.emacs.d/site-lisp")))
-  (when (file-directory-p default-directory)
-    (add-to-list 'load-path default-directory)
-    (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
-        (normal-top-level-add-subdirs-to-load-path))))
+equipment : mask, parent equipment, parent, KYOKUSO, Observe_type, (base: neighbor)
+  failure : mask
+  card : mask, redundant type
+    failure : mask
+    circuit : mask
+      failure : mask
 
-;; =====================================================================
-;; 2. swiper / ivy / counsel の設定
-;; =====================================================================
-(require 'ivy)
-(require 'swiper)
-(require 'counsel)
+network : mask, parent, traffic
 
-;; ivy を有効化（ミニバッファの補完を強力に）
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
+equipment type
+  Mobile : ObservableTarget
+  Base : ObservableTarget
+  ControlCenter : ObservableTarget
+  Other : ObservableTarget
 
-;; キーバインドの設定
-(global-set-key (kbd "C-s") 'swiper)         ; C-s で swiper 起動
-(global-set-key (kbd "M-x") 'counsel-M-x)     ; M-x を counsel 化
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+network type
 
-;; =====================================================================
-;; 3. org-super-agenda の設定
-;; =====================================================================
-;; 依存関係を順番に読み込む
-(require 'dash)
-(require 's)
-(require 'ht)
-(require 'ts)
-(require 'org-super-agenda)
+Alarm Level redundant type
+  single MN
+  single MJ
+  both MN2MJ
+  multipul MN
+  onlyLog
+  none
 
-;; org-super-agenda を有効化
-(org-super-agenda-mode 1)
+failure status type
+  UNKNOWN
+  MN
+  MJ
+  ONLYLOG
+  NONE
+  KYOKUSO (equipment)
+  SHUKUTAI
 
-;; アジェンダのグループ分け設定例（お好みに合わせて調整してください）
-(setq org-super-agenda-groups
-      '((:name "🔥 最優先"
-               :priority "A")
-        (:name "📅 今日の予定"
-               :time-grid t
-               :todo "TODAY")
-        (:name "📝 進行中"
-               :todo "IN-PROGRESS")
-        (:name "🏢 仕事 / プロジェクト"
-               :tag "work")
-        (:name "🏠 プライベート"
-               :tag "home")
-        (:name "⏳ 期限切れ・締切間近"
-               :deadline past
-               :order 1)))
+Alarm Mask
+  mask list
+    class
+    instance
+
+*** config : targetとreletion : parent, children, neighbor, redundant, incident level,,,
+observe info : Equipment info, Card info, Circuit info, network info
+logic  : config observe info から、見出すsurface info
+surface info :
+
+observe info. からsurface infoをlogicで導出することで、中間DTOを排除する。
+
+clean architecture.
+  安定依存の法則 DIP
+
+** SNMP V2C getbulkや変数Biningのトラップ対応し、対象装置の稼働状態と稼働時間を監視する実装コードを作成。C++20、net-snmpを使う。監視結果はlinux posix 共有メモリに出力する。監視対象装置のIPv4アドレスは、192.168.1.240。Clean Architectureにて。
 
 
+✦ Clean Architectureの原則に基づき、SNMP v2c GETBULK
+  によるポーリング、変数バインディング（VarBind）を含むTrapの非同期受信、およびLinux POSIX
+  共有メモリへの監視状態・稼働時間出力を行う C++20 実装コードを設計・提示します。
+  ---
 
-💡 補足と注意点バイトコンパイルについて: オフラインで手動配置した .el ファイルは、そのままだと少し動作が重くなる場合があります。Emacs 上で M-x byte-recompile-directory を実行し、~/.emacs.d/site-lisp を指定してコンパイル（.elc ファイルの生成）を行うと高速化します。
+  アーキテクチャ構成（Clean Architecture 4層構造）
 
--------
-@startuml
-title 5装置間シーケンス図（タイムアウト異常時）
+    1 +---------------------------------------------------------------------------------------+
+    2 |  4. Frameworks & Drivers (Infrastructure)                                             |
+    3 |     - NetSnmpClient (GETBULK 実装)         - NetSnmpTrapDaemon (UDP 162 Trap受信スレッド) |
+    4 |     - PosixSharedMemoryGateway (shm_open, mmap, pthread_mutex)                        |
+    5 +-------------------------------------------+-------------------------------------------+
+    6 |  3. Interface Adapters                    |
+    7 |     - MonitoringCoordinator (定期ポーリングとTrapイベントの統合制御)                     |
+    8 |     - ShmPayloadMapper (Domain Entity -> 共有メモリ固定長構造体へのシリアライズ)        |
+    9 +-----------------------------------+-------+-------------------------------------------+
+   10 |  2. Use Cases (Application Rules) |
+   11 |     - Ports: ISnmpClient, ITrapReceiver, ISharedMemoryGateway                         |
+   12 |     - Interactors: PollDeviceUseCase, ProcessTrapUseCase                              |
+   13 +---------------------------+-------+---------------------------------------------------+
+   14 |  1. Domain (Enterprise)   |
+   15 |     - Entities: DeviceSnapshot, TrapEvent                                             |
+   16 |     - Value Objects: DeviceAddress, Oid, SnmpValue, VarBind, DeviceStatus, DeviceUptime|
+   17 +---------------------------+-----------------------------------------------------------+
 
-' 参加者定義
-actor "クライアント" as Client
-participant "APIゲートウェイ" as Gateway
-participant "認証サービス" as Auth
-participant "ビジネスロジック" as Logic
-participant "外部連携システム" as External
-database "データベース" as DB
+  ---
 
-' 正常系
-Client -> Gateway: 1. 処理要求
-activate Gateway
-Gateway -> Auth: 2. トークン検証
-activate Auth
-Auth --> Gateway: 3. 検証OK
-deactivate Auth
+** TODO オニオンアーキテクチャ
+https://qiita.com/cocoa-maemae/items/e3f2eabbe0877c2af8d0
+** COMMENT Execute Around Method Pattern
+セットアップ、終了処理の集約
+本当に進めたい処理をラムダで
 
-Gateway -> Logic: 4. 業務処理要求
-activate Logic
-Logic -> DB: 5. データ取得
-activate DB
-DB --> Logic: 6. データ応答
-deactivate DB
+   #include <iostream>
+   #include <string>
+   #include <string_view>
+   #include <vector>
+   #include <variant>
+   #include <optional>
+   #include <memory>
+   #include <chrono>
+   #include <format>
+   #include <thread>
+   #include <stop_token>
+   #include <mutex>
+   #include <functional>
+   #include <cstring>
+   #include <cstdint>
+   #include <arpa/inet.h>
+   #include <condition_variable>
 
-Logic -> External: 7. 外部API呼出し
-activate External
+   // POSIX System Headers
+   #include <sys/mman.h>
+   #include <sys/stat.h>
+   #include <fcntl.h>
+   #include <unistd.h>
+   #include <pthread.h>
 
-' タイムアウト異常系（8〜12）
-External --> Logic: 8. ○●●（タイムアウト発生）✗
-note right: 設定タイムアウト(5秒)経過
+   // Net-SNMP C Headers
+   #include <net-snmp/net-snmp-config.h>
+   #include <net-snmp/net-snmp-includes.h>
 
-Logic -> Logic: 9. リトライ処理（最大3回）
-activate Logic
-Logic -> External: 10. 再呼出し
-External --> Logic: 11. 再タイムアウト✗
-deactivate Logic
+   // =============================================================================
+   // 1. Domain Layer (Entities & Value Objects)
+   // =============================================================================
+   namespace Domain {
 
-Logic -> Logic: 12. エラー判定（全リトライ失敗）
-note right: エラーログ出力
+   /// @brief OID (Object Identifier) 値オブジェクト
+   class Oid {
+   public:
+       Oid() = default;
+       explicit Oid(std::string str) : str_repr_(std::move(str)) {}
 
-' エラーレスポンス伝播（13〜16）
-Logic --> Gateway: 13. エラー応答（503/タイムアウト）
-deactivate Logic
+       [[nodiscard]] const std::string& toString() const noexcept { return str_repr_; }
+       auto operator<=>(const Oid&) const = default;
 
-Gateway -> Gateway: 14. エラー変換（500→504）
-Gateway --> Client: 15. エラー応答（504 Gateway Timeout）
-deactivate Gateway
+   private:
+       std::string str_repr_;
+   };
 
-Client -> Client: 16. ユーザーエラー表示
+   /// @brief SNMP変数バインディングの値型 (C++20 std::variant)
+   using SnmpValue = std::variant<
+       std::monostate,
+       int64_t,
+       uint64_t,
+       std::string,
+       Oid
+   >;
 
-@enduml
+   /// @brief 変数バインディング (Variable Binding)
+   struct VarBind {
+       Oid oid;
+       SnmpValue value;
+       std::string type_name;
+   };
 
+   /// @brief 装置の稼働状態
+   enum class OperationalStatus : uint32_t {
+       Unknown   = 0,
+       Up        = 1,
+       Degraded  = 2,
+       Down      = 3
+   };
 
-動作仕様を具体化する（CLI、設定ファイル、ログ出力）
-クラス図のカテゴライズ
-Enterprise Architect バージョン確認してシーケンス図作成が可能か確認。ムリならfloating server 情報メモして17導入
-https://www.sparxsystems.jp/help/17.0/buildandrun.html
-https://learn.microsoft.com/ja-jp/visualstudio/modeling/create-layer-diagrams-from-your-code?view=visualstudio
-https://zenn.dev/naosegu/articles/eb859db78471cd
+   constexpr std::string_view toString(OperationalStatus status) noexcept {
+       switch (status) {
+           case OperationalStatus::Up:       return "UP";
+           case OperationalStatus::Degraded: return "DEGRADED";
+           case OperationalStatus::Down:     return "DOWN";
+           default:                          return "UNKNOWN";
+       }
+   }
 
+   /// @brief 稼働時間 (sysUpTime: 1/100秒単位 = centiseconds)
+   class DeviceUptime {
+   public:
+       constexpr explicit DeviceUptime(uint64_t centisecs = 0) noexcept : centisecs_(centisecs) {}
 
+       [[nodiscard]] constexpr uint64_t centiseconds() const noexcept { return centisecs_; }
+       [[nodiscard]] constexpr uint64_t totalSeconds() const noexcept { return centisecs_ / 100; }
 
-ゾーン収容マップから装置構成、中央と保守制御共有
+       [[nodiscard]] std::string format() const {
+           const uint64_t s = totalSeconds();
+           const uint64_t days  = s / 86400;
+           const uint64_t hours = (s % 86400) / 3600;
+           const uint64_t mins  = (s % 3600) / 60;
+           const uint64_t secs  = s % 60;
+           return std::format("{}d {:02}h {:02}m {:02}s ({}.{:02}s)",
+                              days, hours, mins, secs, s, centisecs_ % 100);
+       }
 
-保守制御イベント、状態引き継ぎ方式
+   private:
+       uint64_t centisecs_{0};
+   };
 
-コールドスタンバイなら、ファイルに書くしか無い共有ディスクにして、参照。
-ウォームスタンバイなら、DRBD
+   /// @brief 受信したTrapイベント Entity
+   struct TrapEvent {
+       std::string source_ip;
+       Oid trap_oid;
+       DeviceUptime uptime;
+       std::vector<VarBind> bindings;
+       std::chrono::system_clock::time_point received_at;
+   };
 
+   /// @brief 監視対象装置のスナップショット Entity
+   struct DeviceSnapshot {
+       std::string ip_address;
+       OperationalStatus status{OperationalStatus::Unknown};
+       DeviceUptime uptime{0};
+       std::string sys_descr;
+       std::string last_trap_oid;
+       std::string last_trap_detail;
+       std::chrono::system_clock::time_point last_poll_time{};
+       std::chrono::system_clock::time_point last_trap_time{};
+   };
 
-監視の設定ファイル例とオニオンコア、stateモナド　規模テスト削減
+   } // namespace Domain
 
-既設の装置構成情報.xml に、保守制御から見てのホップ数を追加、保守制御からみて手前のポップノードを規定
-ホップ使ってその先不定にする障害項目や通信異常を定義
-エリア、ゾーンは、これまで通りだが、基地局ネットワークの構成がエリア単位
-物理回線断とVLAN断、片系断がある
-装置、部位1, 部位2 で階層化
-両系MNでMJは装置、部位、レベルで。
-基地局TRX冗長と縮退判断は？
-アラームマスクリスト、インスタンスとクラス両方対応。
-基地局は、保守制御からみたネットワーク断と中央制御が通信出来ているかがあるが、前者はマイナー、後者はメジャー障害。
-イベントログの保存条件は、ロジックにする？
-基地局ネットワークのサブネットワーク箇所は、ホップで対応？
-CTカードで特別な切り替え時見せ方があったような。
-設定とアラームマスクと局操、外部入力と共有メモリ出力はモナド。
-それ以外は数学的関数
+   // =============================================================================
+   // 2. Use Cases Layer (Ports & Interactors)
+   // =============================================================================
+   namespace UseCases {
 
-非監視設定は、ノードとネットワーク単位で
-非監視と、IP集中監視に出力は別
-エリア間は、サマリと通知のみ
+   /// @brief SNMP クライアント用 Port
+   class ISnmpClient {
+   public:
+       virtual ~ISnmpClient() = default;
+       virtual std::optional<std::vector<Domain::VarBind>> getBulk(
+           std::string_view host,
+           const Domain::Oid& root_oid,
+           int non_repeaters,
+           int max_repetitions) = 0;
+   };
 
-既設は、装置、カード、回路毎にどう取り扱うかのロジックをソースで作り込んでいた。
-電文もそれぞれで解析コードが必要。
+   /// @brief Trap 受信デーモン用 Port
+   class ITrapReceiver {
+   public:
+       using TrapHandler = std::function<void(const Domain::TrapEvent&)>;
+       virtual ~ITrapReceiver() = default;
+       virtual void start(TrapHandler handler) = 0;
+       virtual void stop() = 0;
+   };
 
+   /// @brief POSIX 共有メモリ出力用 Port
+   class ISharedMemoryGateway {
+   public:
+       virtual ~ISharedMemoryGateway() = default;
+       virtual void writeSnapshot(const Domain::DeviceSnapshot& snapshot) = 0;
+   };
 
-既設保守制御、電文詰め替え規模無駄。一回にする意味でも正規化
+   /// @brief 定期ポーリング ユースケース (GETBULK)
+   class PollDeviceUseCase {
+   public:
+       PollDeviceUseCase(std::shared_ptr<ISnmpClient> snmp_client,
+                         std::shared_ptr<ISharedMemoryGateway> shm_gateway)
+           : snmp_client_(std::move(snmp_client)), shm_gateway_(std::move(shm_gateway)) {}
 
-イベントと現在の状態とルール、
+       void execute(std::string_view target_ip, Domain::DeviceSnapshot& snapshot) {
+           // sysUpTime (.1.3.6.1.2.1.1.3.0) および system MIB (.1.3.6.1.2.1.1) を GETBULK
+           const Domain::Oid system_mib_root{".1.3.6.1.2.1.1"};
+           auto vars_opt = snmp_client_->getBulk(target_ip, system_mib_root, 0, 10);
 
-public volatile bool isContinue;
+           snapshot.ip_address = std::string(target_ip);
+           snapshot.last_poll_time = std::chrono::system_clock::now();
 
-int main(int argc, char* argv[])
-{
-        isContinue = true;
+           if (!vars_opt || vars_opt->empty()) {
+               snapshot.status = Domain::OperationalStatus::Down;
+               shm_gateway_->writeSnapshot(snapshot);
+               return;
+           }
 
-        try
-        {
-                CurrentStatus st;
-                RuleSet rule;
-                Target target:
-                
-                bool initSelfResult = initializeSelf(target,rule);
-                bool initStateResult = initializeStatus(target,st);
+           snapshot.status = Domain::OperationalStatus::Up;
 
-                while(isContinue)
-                {
-                        ev = receiveEvent(target);
-                        st = effectEventProcess(ev, st, rule);
-                }
-                finalize();
-        }
-        catch(Exception ...)
-        {
-        }
-        return 1;
-}
+           for (const auto& vb : *vars_opt) {
+               // sysDescr.0 (.1.3.6.1.2.1.1.1.0)
+               if (vb.oid.toString().starts_with(".1.3.6.1.2.1.1.1.0") ||
+                   vb.oid.toString().starts_with("1.3.6.1.2.1.1.1.0")) {
+                   if (auto* str = std::get_if<std::string>(&vb.value)) {
+                       snapshot.sys_descr = *str;
+                   }
+               }
+               // sysUpTimeInstance (.1.3.6.1.2.1.1.3.0)
+               if (vb.oid.toString().starts_with(".1.3.6.1.2.1.1.3.0") ||
+                   vb.oid.toString().starts_with("1.3.6.1.2.1.1.3.0")) {
+                   if (auto* ut = std::get_if<uint64_t>(&vb.value)) {
+                       snapshot.uptime = Domain::DeviceUptime(*ut);
+                   } else if (auto* it = std::get_if<int64_t>(&vb.value)) {
+                       snapshot.uptime = Domain::DeviceUptime(static_cast<uint64_t>(*it));
+                   }
+               }
+           }
 
+           shm_gateway_->writeSnapshot(snapshot);
+       }
 
-public CurrentStatus effectEventProcess(ManagedEvent &ev, CurrentStatus &st, RuleSet &rule)
-{
-        
+   private:
+       std::shared_ptr<ISnmpClient> snmp_client_;
+       std::shared_ptr<ISharedMemoryGateway> shm_gateway_;
+   };
 
-}
+   /// @brief Trap 処理ユースケース (変数バインディングの解析)
+   class ProcessTrapUseCase {
+   public:
+       explicit ProcessTrapUseCase(std::shared_ptr<ISharedMemoryGateway> shm_gateway)
+           : shm_gateway_(std::move(shm_gateway)) {}
+
+       void execute(const Domain::TrapEvent& trap, Domain::DeviceSnapshot& snapshot) {
+           if (trap.source_ip != snapshot.ip_address) {
+               return; // 対象外の装置からのTrapはスキップ
+           }
+
+           snapshot.last_trap_time = trap.received_at;
+           snapshot.last_trap_oid = trap.trap_oid.toString();
+           snapshot.uptime = trap.uptime;
+
+           // 変数バインディングから詳細情報を集約
+           std::string detail_summary;
+           for (const auto& vb : trap.bindings) {
+               std::string val_str;
+               std::visit([&val_str](const auto& v) {
+                   using T = std::decay_t<decltype(v)>;
+                   if constexpr (std::is_same_v<T, std::string>) val_str = v;
+                   else if constexpr (std::is_same_v<T, int64_t>) val_str = std::to_string(v);
+                   else if constexpr (std::is_same_v<T, uint64_t>) val_str = std::to_string(v);
+                   else if constexpr (std::is_same_v<T, Domain::Oid>) val_str = v.toString();
+                   else val_str = "null";
+               }, vb.value);
+
+               detail_summary += std::format("[{}: {}={}] ", vb.type_name, vb.oid.toString(), val_str);
+           }
+           snapshot.last_trap_detail = detail_summary;
+
+           // 代表的な RFC1907 / IF-MIB 標準Trapの判定
+           const auto& toid = trap.trap_oid.toString();
+           if (toid.ends_with(".1.3.6.1.6.3.1.1.5.3") || toid.find("linkDown") != std::string::npos) {
+               snapshot.status = Domain::OperationalStatus::Degraded;
+           } else if (toid.ends_with(".1.3.6.1.6.3.1.1.5.4") || toid.find("linkUp") != std::string::npos) {
+               snapshot.status = Domain::OperationalStatus::Up;
+           } else if (toid.ends_with(".1.3.6.1.6.3.1.1.5.1") || toid.find("coldStart") != std::string::npos) {
+               snapshot.status = Domain::OperationalStatus::Up;
+           }
+
+           shm_gateway_->writeSnapshot(snapshot);
+       }
+
+   private:
+       std::shared_ptr<ISharedMemoryGateway> shm_gateway_;
+   };
+
+   } // namespace UseCases
+
+   // =============================================================================
+   // 3. Infrastructure Layer (Net-SNMP & POSIX Shared Memory)
+   // =============================================================================
+   namespace Infrastructure {
+
+   // 共有メモリ上のバイナリ配置構造体 (POD / Standard Layout)
+   struct alignas(64) ShmDeviceStatusPayload {
+       pthread_mutex_t mutex;
+       uint64_t sequence_id;              // 整合性確認用シーケンス
+       char target_ip[46];                // IPv4/IPv6文字列
+       uint32_t operational_state;        // Domain::OperationalStatus
+       uint64_t uptime_centiseconds;      // sysUpTime
+       int64_t last_poll_epoch_ms;        // 最終ポーリング日時
+       int64_t last_trap_epoch_ms;        // 最終Trap受信日時
+       char sys_descr[256];               // システム説明
+       char last_trap_oid[128];           // 直近のTrap OID
+       char last_trap_detail[512];        // VarBind詳細サマリ
+   };
+
+   /// @brief Linux POSIX 共有メモリ Gateway 実装
+   class PosixSharedMemoryGateway : public UseCases::ISharedMemoryGateway {
+   public:
+       explicit PosixSharedMemoryGateway(std::string shm_name)
+           : shm_name_(std::move(shm_name)) {
+
+           // 共有メモリの作成またはオープン
+           fd_ = ::shm_open(shm_name_.c_str(), O_CREAT | O_RDWR, 0666);
+           if (fd_ == -1) {
+               throw std::runtime_error("Failed to shm_open: " + std::string(strerror(errno)));
+           }
+
+           if (::ftruncate(fd_, sizeof(ShmDeviceStatusPayload)) == -1) {
+               ::close(fd_);
+               throw std::runtime_error("Failed to ftruncate shm: " + std::string(strerror(errno)));
+           }
+
+           void* addr = ::mmap(nullptr, sizeof(ShmDeviceStatusPayload),
+                               PROT_READ | PROT_WRITE, MAP_SHARED, fd_, 0);
+           if (addr == MAP_FAILED) {
+               ::close(fd_);
+               throw std::runtime_error("Failed to mmap shm: " + std::string(strerror(errno)));
+           }
+
+           payload_ = static_cast<ShmDeviceStatusPayload*>(addr);
+
+           // プロセス間共有 Robust Mutex の初期化
+           pthread_mutexattr_t mattr;
+           ::pthread_mutexattr_init(&mattr);
+           ::pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED);
+           ::pthread_mutexattr_setrobust(&mattr, PTHREAD_MUTEX_ROBUST);
+           ::pthread_mutex_init(&payload_->mutex, &mattr);
+           ::pthread_mutexattr_destroy(&mattr);
+       }
+
+       ~PosixSharedMemoryGateway() override {
+           if (payload_) {
+               ::munmap(payload_, sizeof(ShmDeviceStatusPayload));
+           }
+           if (fd_ != -1) {
+               ::close(fd_);
+           }
+           // 必要に応じて shm_unlink(shm_name_.c_str());
+       }
+
+       void writeSnapshot(const Domain::DeviceSnapshot& snapshot) override {
+           if (!payload_) return;
+
+           ::pthread_mutex_lock(&payload_->mutex);
+
+           payload_->sequence_id++;
+           std::strncpy(payload_->target_ip, snapshot.ip_address.c_str(), sizeof(payload_->target_ip) - 1);
+           payload_->operational_state = static_cast<uint32_t>(snapshot.status);
+           payload_->uptime_centiseconds = snapshot.uptime.centiseconds();
+
+           auto to_ms = [](std::chrono::system_clock::time_point tp) -> int64_t {
+               return std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count();
+           };
+
+           payload_->last_poll_epoch_ms = to_ms(snapshot.last_poll_time);
+           payload_->last_trap_epoch_ms = to_ms(snapshot.last_trap_time);
+
+           std::strncpy(payload_->sys_descr, snapshot.sys_descr.c_str(), sizeof(payload_->sys_descr) - 1);
+           std::strncpy(payload_->last_trap_oid, snapshot.last_trap_oid.c_str(), sizeof(payload_->last_trap_oid) - 1);
+           std::strncpy(payload_->last_trap_detail, snapshot.last_trap_detail.c_str(),
+   sizeof(payload_->last_trap_detail) - 1);
+
+           ::pthread_mutex_unlock(&payload_->mutex);
+       }
+
+   private:
+       std::string shm_name_;
+       int fd_{-1};
+       ShmDeviceStatusPayload* payload_{nullptr};
+   };
+
+   /// @brief Net-SNMP 内部データ型から Domain::VarBind へのコンバータ
+   class NetSnmpValueConverter {
+   public:
+       static Domain::VarBind convert(const variable_list* var) {
+           Domain::VarBind vb;
+
+           // OIDの変換
+           char oid_buf[MAX_OID_LEN * 4 + 1];
+           snprint_objid(oid_buf, sizeof(oid_buf), var->name, var->name_length);
+           vb.oid = Domain::Oid(oid_buf);
+
+           // 型判別と値の格納
+           switch (var->type) {
+               case ASN_INTEGER:
+                   vb.type_name = "INTEGER";
+                   vb.value = static_cast<int64_t>(*var->val.integer);
+                   break;
+               case ASN_TIMETICKS:
+                   vb.type_name = "TIMETICKS";
+                   vb.value = static_cast<uint64_t>(*var->val.integer);
+                   break;
+               case ASN_COUNTER:
+               case ASN_GAUGE:
+                   vb.type_name = "COUNTER/GAUGE";
+                   vb.value = static_cast<uint64_t>(*var->val.integer);
+                   break;
+               case ASN_OCTET_STR: {
+                   vb.type_name = "OCTET_STR";
+                   std::string str(reinterpret_cast<const char*>(var->val.string), var->val_len);
+                   vb.value = str;
+                   break;
+               }
+               case ASN_OBJECT_ID: {
+                   vb.type_name = "OBJECT_ID";
+                   char sub_oid_buf[MAX_OID_LEN * 4 + 1];
+                   snprint_objid(sub_oid_buf, sizeof(sub_oid_buf), var->val.objid, var->val_len / sizeof(oid));
+                   vb.value = Domain::Oid(sub_oid_buf);
+                   break;
+               }
+               default:
+                   vb.type_name = std::format("TYPE_{}", var->type);
+                   vb.value = std::monostate{};
+                   break;
+           }
+           return vb;
+       }
+   };
+
+   /// @brief Net-SNMP ライブラリによる GETBULK クライアント実装
+   class NetSnmpClient : public UseCases::ISnmpClient {
+   public:
+       explicit NetSnmpClient(std::string community = "public")
+           : community_(std::move(community)) {
+           static std::once_flag init_flag;
+           std::call_once(init_flag, []() {
+               ::init_snmp("snmp_v2c_monitor_client");
+           });
+       }
+
+       std::optional<std::vector<Domain::VarBind>> getBulk(
+           std::string_view host,
+           const Domain::Oid& root_oid,
+           int non_repeaters,
+           int max_repetitions) override {
+
+           netsnmp_session session{};
+           ::snmp_sess_init(&session);
+           session.version = SNMP_VERSION_2c;
+           session.peername = const_cast<char*>(host.data());
+           session.community = reinterpret_cast<u_char*>(const_cast<char*>(community_.c_str()));
+           session.community_len = community_.length();
+           session.retries = 2;
+           session.timeout = 1000000; // 1秒 (マイクロ秒単位)
+
+           netsnmp_session* ss = ::snmp_open(&session);
+           if (!ss) {
+               return std::nullopt;
+           }
+
+           // PDU の作成: SNMP_MSG_GETBULK
+           netsnmp_pdu* pdu = ::snmp_pdu_create(SNMP_MSG_GETBULK);
+           pdu->non_repeaters = non_repeaters;
+           pdu->max_repetitions = max_repetitions;
+
+           oid anOID[MAX_OID_LEN];
+           size_t anOID_len = MAX_OID_LEN;
+           if (!::snmp_parse_oid(root_oid.toString().c_str(), anOID, &anOID_len)) {
+               ::snmp_free_pdu(pdu);
+               ::snmp_close(ss);
+               return std::nullopt;
+           }
+
+           ::snmp_add_null_var(pdu, anOID, anOID_len);
+
+           netsnmp_pdu* response = nullptr;
+           int status = ::snmp_synch_response(ss, pdu, &response);
+
+           if (status != STAT_SUCCESS || !response || response->errstat != SNMP_ERR_NOERROR) {
+               if (response) ::snmp_free_pdu(response);
+               ::snmp_close(ss);
+               return std::nullopt;
+           }
+
+           std::vector<Domain::VarBind> results;
+           for (variable_list* vars = response->variables; vars != nullptr; vars = vars->next_variable) {
+               // MIB Viewの終端判定
+               if (vars->type == SNMP_ENDOFMIBVIEW ||
+                   vars->type == SNMP_NOSUCHOBJECT ||
+                   vars->type == SNMP_NOSUCHINSTANCE) {
+                   break;
+               }
+               results.push_back(NetSnmpValueConverter::convert(vars));
+           }
+
+           ::snmp_free_pdu(response);
+           ::snmp_close(ss);
+           return results;
+       }
+
+   private:
+       std::string community_;
+   };
+
+   /// @brief Net-SNMP による非同期 Trap 受信デーモン実装
+   class NetSnmpTrapDaemon : public UseCases::ITrapReceiver {
+   public:
+       explicit NetSnmpTrapDaemon(int listen_port = 1162) : listen_port_(listen_port) {}
+
+       ~NetSnmpTrapDaemon() override {
+           stop();
+       }
+
+       void start(TrapHandler handler) override {
+           handler_ = std::move(handler);
+           worker_ = std::jthread([this](std::stop_token stop_token) {
+               runReceiverLoop(stop_token);
+           });
+       }
+
+       void stop() override {
+           if (worker_.joinable()) {
+               worker_.request_stop();
+               worker_.join();
+           }
+       }
+
+   private:
+       static int trapCallback(int op, netsnmp_session* session, int reqid,
+                               netsnmp_pdu* pdu, void* magic) {
+           auto* self = static_cast<NetSnmpTrapDaemon*>(magic);
+           if (op == NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE && pdu) {
+               self->onTrapPdu(pdu);
+           }
+           return 1;
+       }
+
+       void onTrapPdu(netsnmp_pdu* pdu) {
+           if (pdu->command != SNMP_MSG_TRAP2 && pdu->command != SNMP_MSG_INFORM) {
+               return;
+           }
+
+           Domain::TrapEvent event;
+           event.received_at = std::chrono::system_clock::now();
+
+           // 送信元IPアドレスの取得
+           sockaddr_in* addr = reinterpret_cast<sockaddr_in*>(pdu->transport_data);
+           if (addr) {
+               char ip_str[INET_ADDRSTRLEN];
+               ::inet_ntop(AF_INET, &(addr->sin_addr), ip_str, sizeof(ip_str));
+               event.source_ip = ip_str;
+           }
+
+           // 変数バインディングの解析
+           for (variable_list* vars = pdu->variables; vars != nullptr; vars = vars->next_variable) {
+               auto vb = NetSnmpValueConverter::convert(vars);
+
+               // RFC 3416: 1番目のVarBindは sysUpTime.0
+               if (vb.oid.toString().find("sysUpTime") != std::string::npos ||
+                   vb.oid.toString().find(".1.3.6.1.2.1.1.3.0") != std::string::npos) {
+                   if (auto* ut = std::get_if<uint64_t>(&vb.value)) {
+                       event.uptime = Domain::DeviceUptime(*ut);
+                   }
+               }
+               // 2番目のVarBindは snmpTrapOID.0
+               else if (vb.oid.toString().find("snmpTrapOID") != std::string::npos ||
+                        vb.oid.toString().find(".1.3.6.1.6.3.1.1.4.1.0") != std::string::npos) {
+                   if (auto* toid = std::get_if<Domain::Oid>(&vb.value)) {
+                       event.trap_oid = *toid;
+                   }
+               } else {
+                   event.bindings.push_back(std::move(vb));
+               }
+           }
+
+           if (handler_) {
+               handler_(event);
+           }
+       }
+
+       void runReceiverLoop(std::stop_token stop_token) {
+           netsnmp_session session{};
+           ::snmp_sess_init(&session);
+           session.version = SNMP_VERSION_2c;
+           session.peername = const_cast<char*>(std::format("udp:{}", listen_port_).c_str());
+           session.callback = trapCallback;
+           session.callback_magic = this;
+
+           netsnmp_session* ss = ::snmp_open(&session);
+           if (!ss) {
+               std::cerr << std::format("[TrapDaemon] Failed to bind to port {} (Need sudo for 1162?)\n", listen_port_);
+               return;
+           }
+
+           while (!stop_token.stop_requested()) {
+               int numfds = 0;
+               fd_set fdset;
+               timeval timeout{.tv_sec = 0, .tv_usec = 200000}; // 200msポーリング
+               int block = 0;
+
+               FD_ZERO(&fdset);
+               ::snmp_select_info(&numfds, &fdset, &timeout, &block);
+               int rc = ::select(numfds, &fdset, nullptr, nullptr, &timeout);
+
+               if (rc > 0) {
+                   ::snmp_read(&fdset);
+               } else if (rc == 0) {
+                   ::snmp_timeout();
+               }
+           }
+
+           ::snmp_close(ss);
+       }
+
+       int listen_port_;
+       TrapHandler handler_;
+       std::jthread worker_;
+   };
+
+   } // namespace Infrastructure
+
+   // =============================================================================
+   // 4. Interface Adapters Layer (Coordinator & Composition Root)
+   // =============================================================================
+   namespace Adapters {
+
+   class MonitoringCoordinator {
+   public:
+       MonitoringCoordinator(
+           std::string target_ip,
+           std::chrono::milliseconds poll_interval,
+           std::shared_ptr<UseCases::ISnmpClient> snmp_client,
+           std::shared_ptr<UseCases::ITrapReceiver> trap_receiver,
+           std::shared_ptr<UseCases::ISharedMemoryGateway> shm_gateway)
+           : target_ip_(std::move(target_ip)),
+             poll_interval_(poll_interval),
+             trap_receiver_(std::move(trap_receiver)),
+             poll_use_case_(snmp_client, shm_gateway),
+             trap_use_case_(shm_gateway) {
+
+           snapshot_.ip_address = target_ip_;
+       }
+
+       void start() {
+           // 1. Trap 受信デーモンの起動とハンドラ登録
+           trap_receiver_->start([this](const Domain::TrapEvent& trap) {
+               std::lock_guard lock(snapshot_mutex_);
+               std::cout << std::format("\033[1;35m[TRAP RECEIVED]\033[0m From: {} | TrapOID: {}\n",
+                                        trap.source_ip, trap.trap_oid.toString());
+               trap_use_case_.execute(trap, snapshot_);
+           });
+
+           // 2. 定期 GETBULK ポーリングスレッドの起動
+           poller_thread_ = std::jthread([this](std::stop_token stop_token) {
+               std::cout << std::format("[Poller] Starting GETBULK monitoring for {}\n", target_ip_);
+               while (!stop_token.stop_requested()) {
+                   {
+                       std::lock_guard lock(snapshot_mutex_);
+                       poll_use_case_.execute(target_ip_, snapshot_);
+                       printLocalStatus(snapshot_);
+                   }
+
+                   // 中断可能な待機
+                   std::unique_lock<std::mutex> cv_lock(cv_mutex_);
+                   cv_.wait_for(cv_lock, poll_interval_, [&stop_token]() {
+                       return stop_token.stop_requested();
+                   });
+               }
+           });
+       }
+
+       void stop() {
+           if (poller_thread_.joinable()) {
+               poller_thread_.request_stop();
+               cv_.notify_all();
+               poller_thread_.join();
+           }
+           trap_receiver_->stop();
+       }
+
+   private:
+       static void printLocalStatus(const Domain::DeviceSnapshot& s) {
+           std::string_view color = (s.status == Domain::OperationalStatus::Up) ? "\033[1;32m" : "\033[1;31m";
+           std::cout << std::format("[STATUS] Host: {:<15} | State: {}{:<8}\033[0m | Uptime: {}\n",
+                                    s.ip_address, color, Domain::toString(s.status), s.uptime.format());
+       }
+
+       std::string target_ip_;
+       std::chrono::milliseconds poll_interval_;
+       std::shared_ptr<UseCases::ITrapReceiver> trap_receiver_;
+       UseCases::PollDeviceUseCase poll_use_case_;
+       UseCases::ProcessTrapUseCase trap_use_case_;
+
+       Domain::DeviceSnapshot snapshot_;
+       std::mutex snapshot_mutex_;
+       std::condition_variable cv_;
+       std::mutex cv_mutex_;
+       std::jthread poller_thread_;
+   };
+
+   } // namespace Adapters
+
+   // =============================================================================
+   // Application Entry Point
+   // =============================================================================
+   int main() {
+       using namespace std::chrono_literals;
+
+       constexpr const char* TARGET_IP = "192.168.1.241";
+       constexpr const char* SHM_NAME  = "/snmp_monitor_192_168_1_241";
+       constexpr int TRAP_PORT         = 1162; // 一般ユーザー権限でテスト時は 1162 等に変更可
+
+       std::cout << "========================================================\n";
+       std::cout << "  SNMP v2c Monitor (Clean Architecture & C++20)\n";
+       std::cout << std::format("  Target: {} | SHM: {} | TrapPort: {}\n", TARGET_IP, SHM_NAME, TRAP_PORT);
+       std::cout << "========================================================\n";
+
+       try {
+           // 1. Framework / Infrastructure Layer のインスタンス生成
+           auto snmp_client   = std::make_shared<Infrastructure::NetSnmpClient>("public");
+           auto trap_receiver = std::make_shared<Infrastructure::NetSnmpTrapDaemon>(TRAP_PORT);
+           auto shm_gateway   = std::make_shared<Infrastructure::PosixSharedMemoryGateway>(SHM_NAME);
+
+           // 2. Interface Adapters Layer の起動 (2秒間隔ポーリング)
+           Adapters::MonitoringCoordinator coordinator(
+               TARGET_IP, 2000ms, snmp_client, trap_receiver, shm_gateway
+           );
+
+           coordinator.start();
+
+           // 30秒間モニタリングを実行 (Ctrl+C で中断可能)
+           std::cout << "Monitoring running. Press Enter to stop...\n";
+           std::cin.get();
+
+           std::cout << "Stopping monitoring...\n";
+           coordinator.stop();
+
+       } catch (const std::exception& ex) {
+           std::cerr << "Fatal Error: " << ex.what() << '\n';
+           return 1;
+       }
+
+       return 0;
+   }
+
