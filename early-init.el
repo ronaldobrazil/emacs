@@ -17,6 +17,10 @@
 
 ;(elisp-enable-lexical-binding)
 
+;; バイトコンパイル（.elc）の自動生成や読み込みの挙動を抑制し
+;; ネイティブコンパイル（.eln）の非同期生成を有効にする
+(setq native-comp-deferred-compilation t)
+
 ;.5. 自動生成ファイルを無効にする
 (setq make-backup-files nil)
 (setq auto-save-default nil)
