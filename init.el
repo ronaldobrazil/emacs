@@ -330,6 +330,7 @@
     (native-compile-async "~/.emacs.d/lisp/popup-autoloads.el")
     (native-compile-async "~/.emacs.d/lisp/popup-pkg.el")
     (native-compile-async "~/.emacs.d/lisp/popup.el")
+    (native-compile-async "~/.emacs.d/lisp/welkomscherm.el")
     ;(native-compile-async "~/.emacs.d/mozc-popup-autoloads.el")
     ;(native-compile-async "~/.emacs.d/mozc-popup-pkg.el")
     ;(native-compile-async "~/.emacs.d/mozc-popup.el")
@@ -350,11 +351,14 @@
  '(goggles-pulse-delay 0.1)
  '(goggles-pulse-iterations 2)
  '(initial-buffer-choice nil)
+ '(org-agenda-files
+   '("~/.emacs.d/init.el" "/home/bito/Dropbox/AI.org"
+     "/home/bito/Dropbox/personal.org" "/home/bito/Dropbox/todo.org"))
  '(package-selected-packages
-   '(company consult-lsp copilot doom-modeline fcitx flycheck
-             gemini-cli lin lsp-mode lsp-ui lspce pdf-tools popup
-             projectile recentf-ext solarized-theme spaceline
-             spacemacs-theme vterm zenburn-theme zig-mode))
+   '(company consult-lsp copilot doom-modeline fcitx flycheck gemini-cli
+             lin lsp-mode lsp-ui lspce pdf-tools popup projectile
+             recentf-ext solarized-theme spaceline spacemacs-theme
+             vterm zenburn-theme zig-mode))
  '(package-vc-selected-packages
    '((gemini-cli :url "https://github.com/linchen2chris/gemini-cli.el")
      (nskk :url "https://github.com/takeokunn/nskk.el")))
@@ -4367,6 +4371,8 @@ The DWIM behaviour of this command is as follows:
             yas-global-mode
             yas-minor-mode
             lisp-interaction-mode
+            ivy-with-migemo-mode
+            highlight-symbol-mode
             ))
     (mapc (lambda (mode)
         (setq minor-mode-alist
@@ -4679,6 +4685,53 @@ The DWIM behaviour of this command is as follows:
   :ensure t
   :hook c++-mode
   :commands lsp-ui-mode)
+
+; https://codeberg.org/jjba23/welkomscherm.el
+ (require 'welkomscherm)
+  ;; A quiet two-line greeting.
+  (setopt welkomscherm/top-title-list
+          '("Make yourself comfortable."
+            "Your files are right here."))
+  ; recentf
+  (setopt welkomscherm/show-recent-files t
+          welkomscherm/recent-files-limit 5)
+  (setopt welkomscherm/show-system-details t)
+  (setopt welkomscherm/system-details-list
+          '(("Emacs"  . welkomscherm/system-emacs-version)
+            ("System" . welkomscherm/system-description)
+            ("Host"   . system-name)
+            ("User"   . welkomscherm/system-user-name)
+            ("Mood"   . "ready to write")))
+
+  ; bookmarks
+  (setq welkomscherm/bookmarks-list
+        '((("org" . "~/Dropbox/")
+           ("personal" . "~/Dropbox/personal.org")
+           ("AI" . "~/Dropbox/AI.org")
+           ("TODO" . "~/Dropbox/todo.org")
+           ("init.el" . "~/.emacs.d/init.el")
+           ("early-init.el" . "~/.emacs.d/early-init.el")
+)))
+
+  (setopt welkomscherm/work-list
+          '((("projects" . "~/projects/")
+             ("rust" . "~/projects/my-dev-env/"))))
+
+    (setopt welkomscherm/actions-list
+          '((("*scratch*" . (lambda (btn) (switch-to-buffer "*scratch*")))
+             ("*Messages*" . (lambda (btn) (switch-to-buffer "*Messages*")))
+             ("*Org-agenda*" . (lambda (btn) (org-agenda-list)))
+             ("re-render me" . (lambda (btn) (welkomscherm))))))
+
+  (add-hook 'welkomscherm/post-render-hook
+            (lambda () (local-set-key (kbd "q") #'kill-buffer-and-window)
+            ;(split-window-vertically)
+            ;(org-agenda-list)
+              ))
+
+
+  (setq initial-buffer-choice
+        (lambda () (welkomscherm) (get-buffer welkomscherm/buffer-name)))
 
 
 (message "init.el end.")
