@@ -749,6 +749,13 @@
     (my-fcitx5-minibuffer-off)
     (kbd "C-c")))
 
+;; Ctrl-; が押されたらIMEをオフにする
+(define-key key-translation-map (kbd "C-;")
+  (lambda (prompt)
+    ;(my/fcitx-off)
+    (my-fcitx5-minibuffer-off)
+    (kbd "C-;")))
+
 ;;F6 が押されたらIMEをオフにする
 (define-key key-translation-map (kbd "<f6>")
   (lambda (prompt)
@@ -4614,7 +4621,7 @@ The DWIM behaviour of this command is as follows:
 
 
 (use-package projectile
-  :ensure t
+  ; :ensure t
   :init
   (projectile-mode +1)
   :bind (:map projectile-command-map
@@ -4695,13 +4702,13 @@ The DWIM behaviour of this command is as follows:
   ; recentf
   (setopt welkomscherm/show-recent-files t
           welkomscherm/recent-files-limit 5)
-  (setopt welkomscherm/show-system-details t)
-  (setopt welkomscherm/system-details-list
-          '(("Emacs"  . welkomscherm/system-emacs-version)
-            ("System" . welkomscherm/system-description)
-            ("Host"   . system-name)
-            ("User"   . welkomscherm/system-user-name)
-            ("Mood"   . "ready to write")))
+  ;; (setopt welkomscherm/show-system-details t)
+  ;; (setopt welkomscherm/system-details-list
+  ;;         '(("Emacs"  . welkomscherm/system-emacs-version)
+  ;;           ("System" . welkomscherm/system-description)
+  ;;           ("Host"   . system-name)
+  ;;           ("User"   . welkomscherm/system-user-name)
+  ;;           ("Mood"   . "ready to write")))
 
   ; bookmarks
   (setq welkomscherm/bookmarks-list

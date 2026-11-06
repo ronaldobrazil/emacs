@@ -20,6 +20,10 @@
 ;; バイトコンパイル（.elc）の自動生成や読み込みの挙動を抑制し
 ;; ネイティブコンパイル（.eln）の非同期生成を有効にする
 (setq native-comp-deferred-compilation t)
+;; ネティブコンパイルされたファイルの保存先（ユーザー領域）を指定
+(when (boundp 'native-comp-eln-load-path)
+  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory)))
+
 
 ;.5. 自動生成ファイルを無効にする
 (setq make-backup-files nil)
