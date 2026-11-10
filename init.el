@@ -325,6 +325,7 @@
   (setq native-comp-always-compile t)
   (defun my/native-comp-packages ()
     (interactive)
+    (native-compile-async "/usr/local/share/emacs/32.0.50/lisp" 'recursively)
     (native-compile-async "~/.emacs.d/init.el")
     (native-compile-async "~/.emacs.d/early-init.el")
     (native-compile-async "~/.emacs.d/lisp/popup-autoloads.el")
@@ -3018,7 +3019,8 @@
  (setq org-journal-file-format "%Y%m%d.org")
  ;;(setq org-journal-file-type 'monthly)
  (setq org-journal-find-file 'find-file)
- (setq org-journal-file-header 'org-journal-file-header-func)))
+ ;(setq org-journal-file-header 'org-journal-file-header-func)
+))
 
 (defun my/org-journal-open ()
 (interactive)
@@ -3029,19 +3031,27 @@
  (setq org-journal-file-format "%Y%m%d.org")
  ;;(setq org-journal-file-type 'monthly)
  (setq org-journal-find-file 'find-file)
- (setq org-journal-file-header 'org-journal-file-header-func)
+ ;(setq org-journal-file-header 'org-journal-file-header-func)
 (org-journal-new-entry t))
 (global-set-key (kbd "C-c j") 'my/org-journal-open)
 
-(defun my/org-journal-insert-template ()
-  "Insert a template from an external file into a new journal entry."
-  (interactive)
-  (let ((template-file "~/Dropbox/template.org"))
-    (when (and (file-exists-p template-file)
-               (< (buffer-size) 50)) ; Insert only if the file is poor
-      (insert-file-contents template-file))))
-(add-hook 'org-journal-after-entry-create-hook #'my/org-journal-insert-template)
+;; (defun my/org-journal-insert-template ()
+;;   "Insert a template from an external file into a new journal entry."
+;;   (interactive)
+;;   (let ((template-file "~/Dropbox/template.org"))
+;;     (when 
+;;         ;(and
+;;          (file-exists-p template-file)
+;;                ;(< (buffer-size) 50)
+;;                ) ; Insert only if the file is poor
+;;       (insert-file-contents template-file)))
+;;   ;)
+;; (add-hook 'org-journal-after-entry-create-hook #'my/org-journal-insert-template)
 
+(defun my-org-journal-template ()
+  "Insert template content into new org-journal file."
+  (insert-file-contents "~/Dropbox/template.org"))
+(add-hook 'org-journal-after-header-create-hook #'my-org-journal-template)
 
 
 ; https://github.com/jwiegley/alert
@@ -3369,23 +3379,23 @@ Return minutes (number)."
   (setq org-plantuml-jar-path "~/.emacs.d/lib/plantuml.jar")
 
   (org-babel-do-load-languages 'org-babel-load-languages
-                               '((awk . t)
+                               '(;(awk . t)
                                  (C . t)
-                                 (R . t)
+                                 ;(R . t)
                                  ;(clojure . t)
                                  (emacs-lisp . t)
-                                 (haskell . t)
-                                 (java . t)
-                                 (js . t)
-                                 (lisp . t)
+                                 ;(haskell . t)
+                                 ;(java . t)
+                                 ;(js . t)
+                                 ;(lisp . t)
                                  (makefile . t)
                                  ;(perl . t)
                                  (plantuml . t)
-                                 (python . t)
-                                 (ruby . t)
+                                 ;(python . t)
+                                 ;(ruby . t)
                                  ;(scheme . t)
                                  ;(shell . t)
-                                 (sql . t)
+                                 ;(sql . t)
                                  (shell . t))))
 
 
@@ -4728,17 +4738,100 @@ The DWIM behaviour of this command is as follows:
           '((("*scratch*" . (lambda (btn) (switch-to-buffer "*scratch*")))
              ("*Messages*" . (lambda (btn) (switch-to-buffer "*Messages*")))
              ("*Org-agenda*" . (lambda (btn) (org-agenda-list)))
+             ("*Yahoo! mail*" . (lambda (btn) (gnus)))
              ("re-render me" . (lambda (btn) (welkomscherm))))))
 
   (add-hook 'welkomscherm/post-render-hook
             (lambda () (local-set-key (kbd "q") #'kill-buffer-and-window)
-            ;(split-window-vertically)
-            ;(org-agenda-list)
               ))
 
 
   (setq initial-buffer-choice
         (lambda () (welkomscherm) (get-buffer welkomscherm/buffer-name)))
+
+
+
+;;; mail
+(use-package auth-source-xoauth2-plugin
+  :ensure t
+  :custom
+  (auth-source-xoauth2-plugin-mode t))
+
+(setq user-full-name "ronaldobraziljp"
+      user-mail-address "ronaldobraziljp@yahoo.co.jp")
+
+;; メインのセレクトメソッドを無効化（またはニュース等に設定）し、secondaryに追加
+(setq gnus-select-method '(nnnil ""))
+
+;; Gnusのプライマリ/セカンダリの選択メソッドにYahoo IMAP, nifty IMAPを追加
+(setq gnus-secondary-select-methods
+      '((nnimap "yahoo"
+                (nnimap-address "imap.mail.yahoo.co.jp")
+                (nnimap-server-port 993)
+                (nnimap-stream ssl)
+                (nnimap-authinfo-file "~/.authinfo.gpg")) ; 認証情報の保存先
+
+        (nnimap "nifty"
+                (nnimap-address "imap.nifty.com")
+                (nnimap-server-port 993)
+                (nnimap-stream ssl)
+                (user-name "fwin6338")
+                (nnimap-user "h-bitoh@nifty.com")
+                (nnimap-authinfo-file "~/.authinfo.gpg")) ; 認証情報の保存先
+))
+
+;; 新しい順に表示する
+(setq gnus-thread-sort-functions
+      '(gnus-thread-sort-by-number
+        gnus-thread-sort-by-most-recent-date))
+
+(require 'smtpmail)
+(setq send-mail-function 'smtpmail-send-it)
+(setq message-send-mail-function 'smtpmail-send-it)
+
+;; 返信元のグループ名等に応じてSMTPとFromアドレスを自動切り替え
+(setq gnus-posting-styles
+      '(
+        ;; ------------------------------------------------------------
+        ;; ① デフォルト（どれにもマッチしない場合）
+        ;; ------------------------------------------------------------
+        (".*"
+         (address "h-bitoh@nifty.com")
+         (name "bito")
+         ;; X-Message-SMTP-Method: smtp [サーバー] [ポート] [ユーザー名]
+         ("X-Message-SMTP-Method" "smtp smtp.nifty.com 587 h-bitoh@nifty.com"))
+
+        ;; 【1つ目：Yahoo!メールの設定】
+        ;; 元メールが "nnimap+yahoo:" で始まるグループ、または宛先等がyahooを含む場合
+        ("nnimap\\+yahoo.*" 
+         (address "ronaldobraziljp@yahoo.co.jp")
+         (From "bito <ronaldobraziljp@yahoo.co.jp>")
+         ;; X-Message-SMTP-Method: smtp [サーバー名] [ポート] [ユーザー名]
+         ("X-Message-SMTP-Method" "smtp smtp.mail.yahoo.co.jp 587 ronaldobraziljp@yahoo.co.jp"))
+
+        ;; 【2つ目：niftyの設定】
+        ;; 元メールが "nnimap+nifty:" で始まるグループ、または宛先等がniftyを含む場合
+        ;("nifty" 
+        (header "to" "h-bitoh@nifty.com") ; 返信元メールのToヘッダーで判定
+         (address "h-bitoh@nifty.com")
+         (From "h-bitoh <h-bitoh@nifty.com>")
+         ;; X-Message-SMTP-Method: smtp [サーバー名] [ポート] [ユーザー名]
+         ("X-Message-SMTP-Method" "smtp smtp.nifty.com 587 h-bitoh@nifty.com"))
+        )
+
+;; 暗号化（STARTTLS）の設定
+(setq smtpmail-stream-type 'starttls)
+
+; メール一覧（サマリバッファー）表示
+;(setq gnus-summary-line-format "%N%R%z%d %[%4L: %-23,23f%] %ud %s\n")
+(setq gnus-summary-line-format "%N%R%z %[%4L: %-23,23f%] %ud %s\n")
+(defun gnus-user-format-function-d (header)
+  "Gnusのメール一覧（概要バッファ）に YYYY-MM-DD HH:MM 形式で送信日時を表示する"
+  (let* ((date-string (mail-header-date header))
+         (time (and date-string (safe-date-to-time date-string))))
+    (if time
+        (format-time-string "%Y-%m-%d %H:%M" time)
+      "                "))) ; 日時が取得できない場合のフォールバック（空文字スペース16個）
 
 
 (message "init.el end.")
