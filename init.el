@@ -4595,10 +4595,6 @@ The DWIM behaviour of this command is as follows:
 ; https://gist.github.com/tam17aki/650d16384f3b33089228fcebfa678b6e
 ;  (desktop-save-mode 1) ;; tabの構成を含めて復元できる（実質的な永続化の実現）
 
-;6.3. profilerを終了する
-(when my/enable-profile
-  (profiler-report)
-  (profiler-stop))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -4692,10 +4688,10 @@ The DWIM behaviour of this command is as follows:
   (global-company-mode t))
 
 ;; エラーチェック flycheck の設定
-(use-package flycheck
-  :ensure t
-  :hook c++-mode
-  :init (global-flycheck-mode))
+;; (use-package flycheck
+;;   :ensure t
+;;   :hook c++-mode
+;;   :init (global-flycheck-mode))
 
 ;; UI拡張（ホバー情報やブレッドクラム等）
 (use-package lsp-ui
@@ -4703,14 +4699,16 @@ The DWIM behaviour of this command is as follows:
   :hook c++-mode
   :commands lsp-ui-mode)
 
-; https://codeberg.org/jjba23/welkomscherm.el
- (require 'welkomscherm)
-  ;; A quiet two-line greeting.
-  (setopt welkomscherm/top-title-list
+
+
+;;; https://codeberg.org/jjba23/welkomscherm.el
+(require 'welkomscherm)
+;; A quiet two-line greeting.
+(setopt welkomscherm/top-title-list
           '("Make yourself comfortable."
             "Your files are right here."))
-  ; recentf
-  (setopt welkomscherm/show-recent-files t
+; recentf
+(setopt welkomscherm/show-recent-files t
           welkomscherm/recent-files-limit 5)
   ;; (setopt welkomscherm/show-system-details t)
   ;; (setopt welkomscherm/system-details-list
@@ -4720,42 +4718,41 @@ The DWIM behaviour of this command is as follows:
   ;;           ("User"   . welkomscherm/system-user-name)
   ;;           ("Mood"   . "ready to write")))
 
-  ; bookmarks
-  (setq welkomscherm/bookmarks-list
+;;; bookmarks
+(setq welkomscherm/bookmarks-list
         '((("org" . "~/Dropbox/")
            ("personal" . "~/Dropbox/personal.org")
            ("AI" . "~/Dropbox/AI.org")
            ("TODO" . "~/Dropbox/todo.org")
            ("init.el" . "~/.emacs.d/init.el")
-           ("early-init.el" . "~/.emacs.d/early-init.el")
-)))
+           ("early-init.el" . "~/.emacs.d/early-init.el"))))
 
-  (setopt welkomscherm/work-list
+(setopt welkomscherm/work-list
           '((("projects" . "~/projects/")
              ("rust" . "~/projects/my-dev-env/"))))
 
-    (setopt welkomscherm/actions-list
+(setopt welkomscherm/actions-list
           '((("*scratch*" . (lambda (btn) (switch-to-buffer "*scratch*")))
              ("*Messages*" . (lambda (btn) (switch-to-buffer "*Messages*")))
              ("*Org-agenda*" . (lambda (btn) (org-agenda-list)))
-             ("*Yahoo! mail*" . (lambda (btn) (gnus)))
+             ("*Mail*" . (lambda (btn) (gnus)))
              ("re-render me" . (lambda (btn) (welkomscherm))))))
 
-  (add-hook 'welkomscherm/post-render-hook
+(add-hook 'welkomscherm/post-render-hook
             (lambda () (local-set-key (kbd "q") #'kill-buffer-and-window)
               ))
 
 
-  (setq initial-buffer-choice
+(setq initial-buffer-choice
         (lambda () (welkomscherm) (get-buffer welkomscherm/buffer-name)))
 
 
 
-;;; mail
-(use-package auth-source-xoauth2-plugin
-  :ensure t
-  :custom
-  (auth-source-xoauth2-plugin-mode t))
+;;; mail oauth2 はgmailアクセスに必要. これがあると yahoo! japan メールのsmtp送信でエラーになった.
+;; (use-package auth-source-xoauth2-plugin
+;;   :ensure t
+;;   :custom
+;;   (auth-source-xoauth2-plugin-mode t))
 
 (setq user-full-name "ronaldobraziljp"
       user-mail-address "ronaldobraziljp@yahoo.co.jp")
@@ -4786,8 +4783,10 @@ The DWIM behaviour of this command is as follows:
         gnus-thread-sort-by-most-recent-date))
 
 (require 'smtpmail)
-(setq send-mail-function 'smtpmail-send-it)
-(setq message-send-mail-function 'smtpmail-send-it)
+
+
+;; yahoo SMTP送信の設定
+(setq message-send-mail-function 'message-send-mail-with-smtp)
 
 ;; 返信元のグループ名等に応じてSMTPとFromアドレスを自動切り替え
 (setq gnus-posting-styles
@@ -4797,9 +4796,8 @@ The DWIM behaviour of this command is as follows:
         ;; ------------------------------------------------------------
         (".*"
          (address "h-bitoh@nifty.com")
-         (name "bito")
-         ;; X-Message-SMTP-Method: smtp [サーバー] [ポート] [ユーザー名]
-         ("X-Message-SMTP-Method" "smtp smtp.nifty.com 587 h-bitoh@nifty.com"))
+         (name "h-bitoh@nifty.com")
+         ("X-Message-SMTP-Method" "smtp smtp.nifty.com 465 fwin6338"))
 
         ;; 【1つ目：Yahoo!メールの設定】
         ;; 元メールが "nnimap+yahoo:" で始まるグループ、または宛先等がyahooを含む場合
@@ -4807,20 +4805,19 @@ The DWIM behaviour of this command is as follows:
          (address "ronaldobraziljp@yahoo.co.jp")
          (From "bito <ronaldobraziljp@yahoo.co.jp>")
          ;; X-Message-SMTP-Method: smtp [サーバー名] [ポート] [ユーザー名]
-         ("X-Message-SMTP-Method" "smtp smtp.mail.yahoo.co.jp 587 ronaldobraziljp@yahoo.co.jp"))
+         ("X-Message-SMTP-Method" "smtp smtp.mail.yahoo.co.jp 465 ronaldobraziljp@yahoo.co.jp")
+         (eval (setq smtpmail-smtp-server "smtp.mail.yahoo.co.jp"
+                     smtpmail-smtp-service 465
+                     smtpmail-stream-type nil)))
 
         ;; 【2つ目：niftyの設定】
         ;; 元メールが "nnimap+nifty:" で始まるグループ、または宛先等がniftyを含む場合
         ;("nifty" 
         (header "to" "h-bitoh@nifty.com") ; 返信元メールのToヘッダーで判定
          (address "h-bitoh@nifty.com")
-         (From "h-bitoh <h-bitoh@nifty.com>")
-         ;; X-Message-SMTP-Method: smtp [サーバー名] [ポート] [ユーザー名]
-         ("X-Message-SMTP-Method" "smtp smtp.nifty.com 587 h-bitoh@nifty.com"))
+         (name "h-bitoh@nifty.com")
+         ("X-Message-SMTP-Method" "smtp smtp.nifty.com 465 fwin6338"))
         )
-
-;; 暗号化（STARTTLS）の設定
-(setq smtpmail-stream-type 'starttls)
 
 ; メール一覧（サマリバッファー）表示
 ;(setq gnus-summary-line-format "%N%R%z%d %[%4L: %-23,23f%] %ud %s\n")
@@ -4833,5 +4830,24 @@ The DWIM behaviour of this command is as follows:
         (format-time-string "%Y-%m-%d %H:%M" time)
       "                "))) ; 日時が取得できない場合のフォールバック（空文字スペース16個）
 
+; 既読メッセージも表示する
+(setq gnus-fetch-old-headers t)
+(setq gnus-parameters
+      '((".*" ; すべてのグループ、または特定のグループ正規表現
+         (display . all))))
+; (setq gnus-show-all-articles t)
+; (setq gnus-show-all-headers t)
+
+; メール内容バッファ ヘッダを簡略表示
+(setq gnus-treat-hide-headers 'head)
+(add-hook 'gnus-article-prepare-hook
+          (lambda ()
+            (setq gnus-visible-headers "^From:\\|^Subject:\\|^Date:\\|^To:\\|^Cc::")))
+
+
+;6.3. profilerを終了する
+(when my/enable-profile
+  (profiler-report)
+  (profiler-stop))
 
 (message "init.el end.")
