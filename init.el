@@ -3539,6 +3539,7 @@ Return minutes (number)."
       (comment-or-uncomment-region (region-beginning) (region-end))
 )))
 
+
 ; https://misohena.jp/blog/2024-02-18-fix-org-mode-completion.html
 (with-eval-after-load "org-pcomplete"
   ;; 「#+」の部分を補完する関数。
@@ -3723,6 +3724,13 @@ This needs more work, to handle headings with lots of spaces in them."
 ;; (with-eval-after-load 'org-src
 ;;   (add-to-list 'org-src-lang-modes '("treesitter" . treesitter)))
 
+; https://github.com/0x60df/ox-qmd
+(eval-when-compile
+  (el-clone :repo "0x60df/ox-qmd"))
+(with-delayed-execution
+  (message "Install ox-qmd...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/ox-qmd"))
+  (autoload-if-found '(org-qmd-export-as-markdown) "ox-qmd" nil t))
 
 
 ; mark jump https://github.com/DamianB-BitFlipper/javelin.el
@@ -4844,6 +4852,21 @@ The DWIM behaviour of this command is as follows:
           (lambda ()
             (setq gnus-visible-headers "^From:\\|^Subject:\\|^Date:\\|^To:\\|^Cc::")))
 
+
+
+; Qiita https://github.com/0x60df/ox-qmd
+(eval-when-compile
+  (el-clone :repo "0x60df/ox-qmd"))
+
+(with-delayed-execution
+  (message "Install ox-qmd...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/ox-qmd"))
+  (autoload-if-found '(org-qmd-export-to-markdown) "ox-qmd" nil t)
+  (autoload-if-found '(org-qmd-export-as-markdown) "ox-qmd" nil t)
+  (autoload-if-found '(org-qmd-convert-region-to-md) "ox-qmd" nil t))
+
+(with-eval-after-load 'org
+  (add-to-list 'org-export-backends 'md))
 
 ;6.3. profilerを終了する
 (when my/enable-profile
