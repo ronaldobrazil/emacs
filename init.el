@@ -357,9 +357,9 @@
      "/home/bito/Dropbox/personal.org" "/home/bito/Dropbox/todo.org"))
  '(package-selected-packages
    '(company consult-lsp copilot doom-modeline fcitx flycheck gemini-cli
-             lin lsp-mode lsp-ui lspce pdf-tools popup projectile
-             recentf-ext solarized-theme spaceline spacemacs-theme
-             vterm zenburn-theme zig-mode))
+             lin lsp-mode lsp-ui lspce moody pdf-tools popup
+             projectile recentf-ext solarized-theme spaceline
+             spacemacs-theme vterm zenburn-theme zig-mode))
  '(package-vc-selected-packages
    '((gemini-cli :url "https://github.com/linchen2chris/gemini-cli.el")
      (nskk :url "https://github.com/takeokunn/nskk.el")))
@@ -2646,7 +2646,7 @@
   (with-eval-after-load 'nyan-mode
     (setq nyan-cat-face-number 5)
     (setq nyan-animation-frame-interval 1)
-    (setq nyan-bar-length 18)
+    (setq nyan-bar-length 12)
     (setq nyan-animate-nyancat t)))
 
 
@@ -4633,7 +4633,10 @@ The DWIM behaviour of this command is as follows:
  '(org-done ((t (:foreground "PaleGreen" :weight normal :strike-through t))))
  '(org-headline-done ((((class color) (min-colors 16) (background dark)) (:foreground "LightSalmon" :strike-through t)))))
 
-(set-face-attribute 'mode-line nil :background "OliveDrab1" :foreground "gray25" :inherit 'bold :height 120)
+;; (set-face-attribute 'mode-line nil :background "OliveDrab1" :foreground "gray25" :inherit 'bold :height 120)
+
+(set-face-attribute 'mode-line nil :background "DarkSlateBlue" :foreground "WhiteSmoke" :inherit 'bold :height 120)
+
 (set-face-attribute 'mode-line-inactive nil :background "#555555" :foreground "#dddddd" :height 120)
 
 (defun my-set-minibuffer-font-size ()
@@ -4787,6 +4790,7 @@ The DWIM behaviour of this command is as follows:
 ;; メインのセレクトメソッドを無効化（またはニュース等に設定）し、secondaryに追加
 (setq gnus-select-method '(nnnil ""))
 
+(require 'nnatom)
 ;; Gnusのプライマリ/セカンダリの選択メソッドにYahoo IMAP, nifty IMAPを追加
 (setq gnus-secondary-select-methods
       '((nnimap "yahoo"
@@ -4802,7 +4806,10 @@ The DWIM behaviour of this command is as follows:
                 (user-name "fwin6338")
                 (nnimap-user "h-bitoh@nifty.com")
                 (nnimap-authinfo-file "~/.authinfo.gpg")) ; 認証情報の保存先
-))
+
+        (nnatom "qiita.com/tags/emacs/feed.atom"
+                      ;; グループ名を任意で指定する場合（省略可）
+                      (nnatom-name "Qiita emacs"))))
 
 ;; 新しい順に表示する
 (setq gnus-thread-sort-functions
@@ -4874,34 +4881,6 @@ The DWIM behaviour of this command is as follows:
 
 
 
-;;; https://github.com/zk-phi/sky-color-clock
-(require 'sky-color-clock)
-(sky-color-clock-initialize 35) ; Tokyo, Japan
-(setq sky-color-clock-format "%d %H:%M")
-(setq sky-color-clock-enable-temperature-indicator t)
-(push '(:eval (sky-color-clock)) (default-value 'mode-line-format))
-
-;; auth-source の読み込み（標準搭載）
-(require 'auth-source)
-;; ~/.authinfo.gpg を優先して参照するように設定
-(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo"))
-;; OpenWeather の API キーを取得する関数
-(defun my/get-openweather-api-key ()
-  "authinfo.gpg から OpenWeather の API キーを取得する."
-  (let ((found (nth 0 (auth-source-search :host "api.openweathermap.org"
-                                          :user "apikey"
-                                          :require '(:secret)))))
-    (if found
-        (let ((secret (plist-get found :secret)))
-          (if (functionp secret)
-              (funcall secret)
-            secret))
-      (error "OpenWeather API key not found in authinfo"))))
-
-;; 2. 第1引数にその変数を渡して関数を実行する
-(sky-color-clock-initialize-openweathermap-client (my/get-openweather-api-key), 1861310)
-
-
 ;https://github.com/protesilaos/dired-preview
 (eval-when-compile
   (el-clone :repo "protesilaos/dired-preview"))
@@ -4917,7 +4896,7 @@ The DWIM behaviour of this command is as follows:
   ;; Default values for demo purposes
   (setq dired-preview-delay 0.5)
   ; (setq dired-preview-max-size (expt 2 20))
-  (setq dired-preview-max-size (* 1024 1024 30))) ; 30MB以下など
+  (setq dired-preview-max-size (* 1024 1024 30)) ; 30MB以下など
   (setq dired-preview-ignored-extensions-regexp
         (concat "\\."
                 "\\(gz\\|"
@@ -4945,6 +4924,45 @@ The DWIM behaviour of this command is as follows:
   ;; Enable `dired-preview-mode' in a given Dired buffer or do it
   ;; globally:
   (dired-preview-global-mode 1))
+
+
+;;; https://github.com/zk-phi/sky-color-clock
+(require 'sky-color-clock)
+(sky-color-clock-initialize 35) ; Tokyo, Japan
+(setq sky-color-clock-format "%d %H:%M")
+(setq sky-color-clock-enable-temperature-indicator t)
+(push '(:eval (sky-color-clock)) (default-value 'mode-line-format))
+
+;; ;; auth-source の読み込み（標準搭載）
+;; (require 'auth-source)
+;; ;; ~/.authinfo.gpg を優先して参照するように設定
+;; (setq auth-sources '("~/.authinfo.gpg" "~/.authinfo"))
+;; ;; OpenWeather の API キーを取得する関数
+;; (defun my/get-openweather-api-key ()
+;;   "authinfo.gpg から OpenWeather の API キーを取得する."
+;;   (let ((found (nth 0 (auth-source-search :host "api.openweathermap.org"
+;;                                           :user "apikey"
+;;                                           :require '(:secret)))))
+;;     (if found
+;;         (let ((secret (plist-get found :secret)))
+;;           (if (functionp secret)
+;;               (funcall secret)
+;;             secret))
+;;       (error "OpenWeather API key not found in authinfo"))))
+
+;; ;; 2. 第1引数にその変数を渡して関数を実行する
+;; (sky-color-clock-initialize-openweathermap-client (my/get-openweather-api-key), 1861310)
+
+
+(use-package moody
+  :ensure t
+  :config
+  (moody-replace-mode-line-front-space)
+  (moody-replace-mode-line-buffer-identification)
+  (setopt moody-mode-line-height 16)
+  ; (setopt x-underline-at-descent-line t)
+  (moody-replace-vc-mode))
+
 
 
 ;6.3. profilerを終了する

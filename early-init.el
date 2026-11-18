@@ -92,6 +92,7 @@
 
 ; Emacs Version >= 26 fast.
 (setq global-display-line-numbers-mode 1)
+(line-number-mode -1)
 
 ;; Set part of theme at startup
 (custom-set-faces
