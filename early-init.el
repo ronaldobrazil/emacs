@@ -34,7 +34,7 @@
 ;.6. time locale
 (setq system-time-locale "C")
 
-(display-time)
+; (display-time)
 
 ;.7. GC/Memory
 (setq gc-cons-percentage 0.2

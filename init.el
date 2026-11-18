@@ -1120,7 +1120,7 @@
 
   (autoload-if-found '(haskell-mode) "haskell-mode" nil t)
 
-  (add-to-list 'auto-mode-alist '("\\.hs$" . pcap-mode)))
+  (add-to-list 'auto-mode-alist '("\\.hs$" . haskell-mode)))
 
 
 
@@ -2809,12 +2809,12 @@
 
 
 ; ox-qmd org-mode to qiita markdown export C-c C-e
-(eval-when-compile
-  (el-clone :repo "0x60df/ox-qmd"))
-(with-delayed-execution
-  (message "Install ox-qmd...")
-  (add-to-list 'load-path (locate-user-emacs-file "el-clone/ox-qmd"))
-  (autoload-if-found '(org-qmd-export-to-markdown org-qmd-convert-region-to-md) "ox-qmd" nil t))
+;; (eval-when-compile
+;;   (el-clone :repo "0x60df/ox-qmd"))
+;; (with-delayed-execution
+;;   (message "Install ox-qmd...")
+;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/ox-qmd"))
+;;   (autoload-if-found '(org-qmd-export-to-markdown org-qmd-convert-region-to-md) "ox-qmd" nil t))
 
 ;; ; minions : minor-mode show few word.
 ;; (eval-when-compile
@@ -3384,7 +3384,7 @@ Return minutes (number)."
                                  ;(R . t)
                                  ;(clojure . t)
                                  (emacs-lisp . t)
-                                 ;(haskell . t)
+                                 (haskell . t)
                                  ;(java . t)
                                  ;(js . t)
                                  ;(lisp . t)
@@ -3397,6 +3397,23 @@ Return minutes (number)."
                                  ;(shell . t)
                                  ;(sql . t)
                                  (shell . t))))
+
+
+
+; Qiita https://github.com/0x60df/ox-qmd
+(eval-when-compile
+  (el-clone :repo "0x60df/ox-qmd"))
+
+(with-delayed-execution
+  (message "Install ox-qmd...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/ox-qmd"))
+  (autoload-if-found '(org-qmd-export-to-markdown) "ox-qmd" nil t)
+  (autoload-if-found '(org-qmd-export-as-markdown) "ox-qmd" nil t)
+  (autoload-if-found '(org-qmd-convert-region-to-md) "ox-qmd" nil t))
+
+(with-eval-after-load 'org
+  (add-to-list 'org-export-backends 'md))
+
 
 
 ; https://github.com/tkf/emacs-request (for emacs-websearch)
@@ -4744,7 +4761,9 @@ The DWIM behaviour of this command is as follows:
              ("*Messages*" . (lambda (btn) (switch-to-buffer "*Messages*")))
              ("*Org-agenda*" . (lambda (btn) (org-agenda-list)))
              ("*Mail*" . (lambda (btn) (gnus)))
-             ("re-render me" . (lambda (btn) (welkomscherm))))))
+             ("*Dired*" . (lambda (btn) (dired-jump)))
+             ;("re-render me" . (lambda (btn) (welkomscherm)))
+)))
 
 (add-hook 'welkomscherm/post-render-hook
             (lambda () (local-set-key (kbd "q") #'kill-buffer-and-window)
@@ -4854,19 +4873,79 @@ The DWIM behaviour of this command is as follows:
 
 
 
-; Qiita https://github.com/0x60df/ox-qmd
+
+;;; https://github.com/zk-phi/sky-color-clock
+(require 'sky-color-clock)
+(sky-color-clock-initialize 35) ; Tokyo, Japan
+(setq sky-color-clock-format "%d %H:%M")
+(setq sky-color-clock-enable-temperature-indicator t)
+(push '(:eval (sky-color-clock)) (default-value 'mode-line-format))
+
+;; auth-source の読み込み（標準搭載）
+(require 'auth-source)
+;; ~/.authinfo.gpg を優先して参照するように設定
+(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo"))
+;; OpenWeather の API キーを取得する関数
+(defun my/get-openweather-api-key ()
+  "authinfo.gpg から OpenWeather の API キーを取得する."
+  (let ((found (nth 0 (auth-source-search :host "api.openweathermap.org"
+                                          :user "apikey"
+                                          :require '(:secret)))))
+    (if found
+        (let ((secret (plist-get found :secret)))
+          (if (functionp secret)
+              (funcall secret)
+            secret))
+      (error "OpenWeather API key not found in authinfo"))))
+
+;; 2. 第1引数にその変数を渡して関数を実行する
+(sky-color-clock-initialize-openweathermap-client (my/get-openweather-api-key), 1861310)
+
+
+;https://github.com/protesilaos/dired-preview
 (eval-when-compile
-  (el-clone :repo "0x60df/ox-qmd"))
+  (el-clone :repo "protesilaos/dired-preview"))
 
-(with-delayed-execution
-  (message "Install ox-qmd...")
-  (add-to-list 'load-path (locate-user-emacs-file "el-clone/ox-qmd"))
-  (autoload-if-found '(org-qmd-export-to-markdown) "ox-qmd" nil t)
-  (autoload-if-found '(org-qmd-export-as-markdown) "ox-qmd" nil t)
-  (autoload-if-found '(org-qmd-convert-region-to-md) "ox-qmd" nil t))
+(with-eval-after-load 'dired
+;(with-delayed-execution
+  (message "Install dired-preview...")
+  (add-to-list 'load-path (locate-user-emacs-file "el-clone/dired-preview"))
+  ;(autoload-if-found '(dired-preview-mode) "dired-preview" nil t)
 
-(with-eval-after-load 'org
-  (add-to-list 'org-export-backends 'md))
+  (require 'dired-preview)
+  ;(dired-preview-global-mode 1)
+  ;; Default values for demo purposes
+  (setq dired-preview-delay 0.5)
+  ; (setq dired-preview-max-size (expt 2 20))
+  (setq dired-preview-max-size (* 1024 1024 30))) ; 30MB以下など
+  (setq dired-preview-ignored-extensions-regexp
+        (concat "\\."
+                "\\(gz\\|"
+                "zst\\|"
+                "tar\\|"
+                "xz\\|"
+                "rar\\|"
+                "zip\\|"
+                "iso\\|"
+                "epub"
+                "\\)"))
+
+  ;; 無視する拡張子のリストから画像拡張子を削除する
+  (setq dired-preview-ignored-extensions
+        (remove ".png"
+                (remove ".jpg"
+                        (remove ".jpeg"
+                                dired-preview-ignored-extensions))))
+  (defun my-dired-preview-to-the-bottom ()
+  "My preferred `dired-preview-display-action-alist-function'."
+  '((display-buffer-at-bottom)
+    ;(side . right)
+    (window-width . 0.35)))
+  (setq dired-preview-display-action-alist #'my-dired-preview-to-the-bottom)
+  ;; Enable `dired-preview-mode' in a given Dired buffer or do it
+  ;; globally:
+  (dired-preview-global-mode 1))
+
 
 ;6.3. profilerを終了する
 (when my/enable-profile

@@ -16,6 +16,41 @@ tortoise git
 winmerge
 
 
+
+● C++23のプロトタイプを追加しました。設定・SNMP取得・監視周期・共有メモリ出力を分離し、最大500    ┃
+   ノードを並行して5秒周期で監視します。                                                           ┃
+                                                                                                   ┃
+   •  config/nodes.json : IPv4アドレスとSNMP v2cコミュニティ                                       ┃
+   •  config/mibs.json : key、数値OID、 minor （軽故障）／ major （重故障）                        ┃
+   • POSIX共有メモリ  /snmp_v2c_monitor  に、key-value形式のJSONスナップショットを出力             ┃
+   • SNMP応答の欠落・失敗時に、MIBごとの設定レベルを適用します。値の閾値判定は含めていません。     ┃
+   • スカラーOIDを対象とし、インスタンス末尾の  .0  を省いたOIDを指定してください。                ┃
+                                                                                                   ┃
+   ビルドと共有メモリへのJSON出力を確認済みです。起動方法は  ./snmp_v2c_monitor config/nodes.json  ┃
+   config/mibs.json 、詳細は  README.md  に記載しました。                                          ┃
+ 
+  ❯ 監視結果出力のposix共有メモリを定期的に読み出して標準出力に出力するC++23プログラムを別 14:57   ┃
+    ディレクトリであるoutputtest以下にmakeファイル含めて作成
+
+既存の共有メモリ名・ロック方式・JSON形式に合わせて、`outputtest/` に独立してビルドできる読み出しプログラムを作ります。まず既存の出力仕様とディレクトリ状態を確認します。
+
+`outputtest/` に共有メモリ読み出しプログラムとMakefileを作成しました。既定では `/snmp_v2c_monitor` を5秒間隔で読み、ロック中にJSONスナップショットをコピーして標準出力へ1行ずつ出します。Ctrl-CまたはSIGTERMで終了します。
+
+```sh
+make -C outputtest
+./outputtest/shm_reader
+```
+
+共有メモリ名と読み出し間隔（秒）は指定で変更できます。
+
+```sh
+./outputtest/shm_reader /snmp_v2c_monitor 1
+```
+
+監視プログラムと連携して動作し、出力JSONも検証しました。共有メモリがまだ作成されていない場合は、監視プログラムを先に起動してください。
+
+
+----------------------------------
 * TODO 保守制御のアーキテクチャ土台を作る model 部分
   [[file:/home/bito/copilot-linux-x64/main.cpp]]
 ** Design
