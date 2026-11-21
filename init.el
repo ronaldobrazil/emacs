@@ -4635,7 +4635,8 @@ The DWIM behaviour of this command is as follows:
 
 ;; (set-face-attribute 'mode-line nil :background "OliveDrab1" :foreground "gray25" :inherit 'bold :height 120)
 
-(set-face-attribute 'mode-line nil :background "DarkSlateBlue" :foreground "WhiteSmoke" :inherit 'bold :height 120)
+;; (set-face-attribute 'mode-line nil :background "DarkSlateBlue" :foreground "WhiteSmoke" :inherit 'bold :height 120)
+(set-face-attribute 'mode-line nil :background "DarkCyan" :foreground "WhiteSmoke" :inherit 'bold :height 120)
 
 (set-face-attribute 'mode-line-inactive nil :background "#555555" :foreground "#dddddd" :height 120)
 
@@ -4816,9 +4817,21 @@ The DWIM behaviour of this command is as follows:
       '(gnus-thread-sort-by-number
         gnus-thread-sort-by-most-recent-date))
 
+;; 自動保存ファイルを無効にする、これを無効にするとRSSが表示されない
+(setq gnus-use-dribble-file nil)
+
+
+;; 100件までは確認なしで開く
+; (setq gnus-large-newsgroup 100)
+;;; 常に確認なしで全件取得する nil は How many articles from の質問を無しにする.
+(setq gnus-large-newsgroup nil)
+;; 常に最新の1000件のみを対象にする
+(setq gnus-newsgroup-maximum-articles 100)
+;; スレッド構築のために最大100件まで古いヘッダを取得する（t にすると全件）
+(setq gnus-fetch-old-headers 100)
+
+
 (require 'smtpmail)
-
-
 ;; yahoo SMTP送信の設定
 (setq message-send-mail-function 'message-send-mail-with-smtp)
 
