@@ -4829,7 +4829,8 @@ The DWIM behaviour of this command is as follows:
 (setq gnus-newsgroup-maximum-articles 100)
 ;; スレッド構築のために最大100件まで古いヘッダを取得する（t にすると全件）
 (setq gnus-fetch-old-headers 100)
-
+;; 新規メール作成時に Cc: と Bcc: を最初から表示する
+(setq message-default-mail-headers "Cc: \nBcc: \n")
 
 (require 'smtpmail)
 ;; yahoo SMTP送信の設定

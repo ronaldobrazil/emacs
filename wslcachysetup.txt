@@ -1,0 +1,144 @@
+Windows 11 + WSL 2: CachyOS / niri / Noctalia セットアップ
+===========================================================
+
+目的
+----
+Windows 11 上の WSL 2 に CachyOS を導入し、WSLg の Wayland 上で niri を
+ネスト（ウィンドウ）起動し、その中で Noctalia Shell を使う手順です。
+Windows のデスクトップ環境を置き換えるのではなく、niri が通常のウィンドウ
+として開きます。ネスト実行は niri の開発・試用向けで、一部制限があります。
+
+バージョンについて
+------------------
+CachyOS 公式 WSL イメージの手順は WSL 2 を対象としており、現在の案内では
+WSL 2.4.4 以上で .wsl イメージをダブルクリックして導入します。
+「WSL 3.0」という指定は不要です。WSL の更新版を使っていても、ディストリ
+ビューションは WSL 2 として実行します。WSL 1 は CachyOS WSL イメージで
+サポートされません。
+
+Microsoft の WSL オンラインディストリビューション一覧に CachyOS が掲載
+されていない場合は `wsl --install -d CachyOS` では導入できません。
+その場合は CachyOS プロジェクトが公開する公式 WSL イメージを使います。
+これは CachyOS プロジェクトの公式イメージであり、Microsoft Store の
+ディストリビューション提供とは別です。
+
+1. Windows 側の WSL を確認・更新
+--------------------------------
+PowerShell で実行します。
+
+    wsl --version
+    wsl --update
+    wsl --shutdown
+    wsl --list --verbose
+
+対象ディストリビューションの VERSION が 2 であることを確認します。
+WSL のバージョンが 2.4.4 未満の場合は Microsoft Store から WSL を更新し、
+再度 `wsl --version` で確認してください。
+
+2. CachyOS の導入
+-----------------
+1) 次の公式リリースページを開き、最新リリースの
+   `cachyos-....wsl` をダウンロードします。.wsl.bundle ではなく .wsl
+   イメージを選びます。
+
+   https://github.com/CachyOS/cachyos-wsl/releases/latest
+
+2) ダウンロードした .wsl ファイルをダブルクリックし、WSL の案内に従って
+   インストールします。初回起動時にユーザー名とパスワードを設定します。
+   ユーザーは sudo 権限を持つ wheel グループに追加されます。
+
+3) PowerShell から CachyOS を起動します。
+
+    wsl -d cachyos
+
+4) CachyOS 内で初回のパッケージ更新を行います。
+
+    sudo pacman -Syu
+
+更新中にカーネルやシステムライブラリが更新された場合は、いったん
+`exit` で終了し、PowerShell で `wsl --terminate cachyos` を実行してから
+再起動します。
+
+3. niri と Noctalia のインストール
+----------------------------------
+CachyOS のシェルで、次を実行します。
+
+    sudo pacman -Syu niri noctalia alacritty fuzzel xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk noto-fonts-cjk
+
+`niri` は Wayland コンポジター、`noctalia` はデスクトップシェルです。
+Alacritty と fuzzel は niri の既定キーバインド用、xwayland-satellite は
+X11 アプリ互換用です。日本語フォントが不要であれば noto-fonts-cjk は
+省略できます。
+
+4. Noctalia を niri の起動時に自動起動
+--------------------------------------
+1) CachyOS のシェルで `niri` を一度起動します。WSLg の Wayland 接続を使い、
+   niri のウィンドウが表示されます。初回起動時にユーザー設定が存在しない
+   場合は、niri が既定設定を `~/.config/niri/config.kdl` に作成します。
+
+    niri
+
+2) ネストした niri では既定の Mod キーは Alt です。`Alt+Shift+E` で niri
+   を終了し、設定ファイルを編集します。
+
+    nano ~/.config/niri/config.kdl
+
+3) ファイル末尾に次の行を追加して保存します。既存の設定は削除せず、
+   `spawn-at-startup` が既にある場合は重複させないでください。
+
+    spawn-at-startup "noctalia"
+
+4) 設定を検証し、niri をもう一度起動します。
+
+    niri validate
+    niri
+
+Noctalia のバーやランチャーが niri のウィンドウ内に表示されます。
+既定設定では `Alt+T` で Alacritty、`Alt+D` で fuzzel、`Alt+Shift+E` で
+niri を終了します。キー操作は Windows や他のアプリのショートカットと
+競合する場合があります。
+
+5. 起動方法と確認
+-----------------
+次回からは Windows Terminal 等で CachyOS を開き、次を実行します。
+
+    niri
+
+Noctalia を手動で試す場合は、niri のウィンドウ内のターミナルから
+`noctalia` を実行できます。通常は前節の `spawn-at-startup` を使います。
+
+WSLg の接続を確認するには、CachyOS 内で次を実行します。
+
+    echo "$WAYLAND_DISPLAY"
+
+空でなければ Wayland ディスプレイ変数が設定されています。空の場合は
+PowerShell で `wsl --update` と `wsl --shutdown` を実行してから再確認し、
+Windows 11 の WSLg が有効な WSL 2 環境で起動しているか確認してください。
+WSLg 環境では `WAYLAND_DISPLAY` を手動で固定しないでください。
+
+補足
+----
+* CachyOS の WSL イメージには systemd が有効な `/etc/wsl.conf` が含まれます。
+  設定を書き換える必要はありません。
+* WSLg/niri のネストモードは通常の Linux デスクトップセッションと同等では
+  ありません。ロック画面、画面共有、GPU 機能などは制限されることがあります。
+* CachyOS はローリングリリースです。定期的に `sudo pacman -Syu` で更新し、
+  更新時の CachyOS 公式告知も確認してください。
+
+参考資料（公式）
+----------------
+CachyOS WSL イメージ・導入手順:
+https://github.com/CachyOS/cachyos-wsl
+https://github.com/CachyOS/cachyos-wsl/releases/latest
+
+Microsoft WSL のインストール・カスタムディストリビューション:
+https://learn.microsoft.com/windows/wsl/install
+https://learn.microsoft.com/windows/wsl/use-custom-distro
+
+niri の起動・ネスト実行と設定:
+https://niri-wm.github.io/niri/Getting-Started.html
+https://niri-wm.github.io/niri/Configuration%3A-Introduction.html
+
+Noctalia のインストール・起動:
+https://docs.noctalia.dev/noctalia/getting-started/installation/
+https://docs.noctalia.dev/noctalia/getting-started/running-the-shell/

@@ -1,0 +1,147 @@
+Windows 11 + WSL 2: CachyOS 上で GNU Emacs PGTK をビルド
+========================================================
+
+目的
+----
+WSL 2 上の CachyOS で GNU Emacs を PGTK (Pure GTK) 構成でソースからビルドし、
+WSLg を通じて Windows 11 デスクトップ上に通常のアプリウィンドウとして表示
+します。niri や Linux のデスクトップ環境は起動しません。
+
+バージョンに関する注意
+----------------------
+この手順は WSL 2 + WSLg を前提にします。「WSL 3.0」という別のディストリ
+ビューション実行モードを設定するものではありません。CachyOS の WSL イメージ
+は WSL 2 用です。現在の案内では WSL 2.4.4 以上で .wsl ファイルをダブル
+クリックしてインストールします。
+
+1. WSL 2 / WSLg の準備
+----------------------
+PowerShell（必要に応じて管理者として起動）で実行します。
+
+    wsl --version
+    wsl --update
+    wsl --shutdown
+    wsl --list --verbose
+
+WSL の更新後、CachyOS の VERSION が 2 であることを確認します。Windows 11 の
+WSLg は Linux GUI アプリを個別のウィンドウとして Windows デスクトップに表示
+します。VcXsrv などの別 X サーバーや、Linux デスクトップ環境は不要です。
+
+2. CachyOS の導入
+-----------------
+1) CachyOS 公式 WSL リリースから最新の `cachyos-....wsl` を取得します。
+   `.wsl.bundle` ではなく `.wsl` イメージを選びます。
+
+   https://github.com/CachyOS/cachyos-wsl/releases/latest
+
+2) `.wsl` ファイルをダブルクリックしてインストールし、初回起動で求められたら
+   Linux ユーザー名とパスワードを設定します。
+
+3) PowerShell から CachyOS を起動します。
+
+    wsl -d cachyos
+
+4) CachyOS 内で初回更新します。
+
+    sudo pacman -Syu
+
+3. PGTK ビルドに必要なパッケージ
+--------------------------------
+GNU Emacs 31.1 を例に、GTK 3 / Cairo / HarfBuzz、ネイティブコンパイル、
+Tree-sitter、および一般的な画像形式を有効にする構成です。
+
+    sudo pacman -S --needed base-devel gtk3 cairo harfbuzz gnutls gmp lcms2 libgccjit libotf libpng zlib tree-sitter giflib libjpeg-turbo libtiff libxpm librsvg libwebp libxml2
+
+`base-devel` はコンパイラーや make などのビルドツールを含みます。
+`libgccjit` はネイティブコンパイル用です。ネイティブコンパイルが不要なら
+後述の configure オプションから `--with-native-compilation=aot` を外し、
+`libgccjit` も省略できます。
+
+4. GNU Emacs ソースの取得とビルド
+---------------------------------
+GNU の公式配布サイトからリリース tarball を取得します。バージョンを変更する
+場合は URL と展開後のディレクトリ名を同じ値にします。
+
+    cd ~
+    curl -fLO https://ftp.gnu.org/gnu/emacs/emacs-31.1.tar.xz
+    tar -xf emacs-31.1.tar.xz
+    cd emacs-31.1
+
+GTK 3 の PGTK バックエンドを有効にして configure します。
+
+    ./configure --prefix=/usr/local \
+      --with-pgtk \
+      --with-cairo \
+      --with-harfbuzz \
+      --with-modules \
+      --with-native-compilation=aot \
+      --with-tree-sitter
+
+configure の最後のサマリーを確認し、GTK/PGTK、Cairo、HarfBuzz、
+ネイティブコンパイル、Tree-sitter が有効になっていることを確認します。
+`configure` が依存ライブラリ不足で停止した場合は、表示されたライブラリ名に
+対応する CachyOS パッケージを追加してから再実行します。
+
+ビルドして、インストール前に GUI を試します。
+
+    make -j"$(nproc)"
+    GDK_BACKEND=wayland ./src/emacs -Q
+
+初回ビルドは時間がかかります。メモリ不足で失敗する場合は `-j2` など並列数を
+減らして `make` を再実行してください。GUI が表示され、問題がなければ
+`Alt+F4` で終了します。その後インストールします。
+
+    sudo make install
+    hash -r
+
+`--prefix=/usr/local` を使っているため、ファイルは pacman 管理外の
+`/usr/local` に入ります。pacman 管理の Emacs と混同しないよう、
+`command -v emacs` が `/usr/local/bin/emacs` を指すことを確認してください。
+
+5. Windows デスクトップのウィンドウとして起動
+----------------------------------------------
+CachyOS のシェルで WSLg の Wayland 接続を確認します。
+
+    echo "$WAYLAND_DISPLAY"
+
+空でなければ、次のコマンドで PGTK 版を起動します。
+
+    GDK_BACKEND=wayland /usr/local/bin/emacs -Q
+
+Windows から PowerShell で直接起動する場合:
+
+    wsl -d cachyos -- env GDK_BACKEND=wayland /usr/local/bin/emacs -Q
+
+Emacs は Windows デスクトップ上の独立したウィンドウとして表示されます。
+`-Q` はユーザー設定を読み込まずに試すオプションです。通常起動では最後の
+`-Q` を外します。
+
+6. トラブルシューティング
+--------------------------
+* `WAYLAND_DISPLAY` が空の場合、PowerShell で `wsl --update` と
+  `wsl --shutdown` を実行して再起動します。ディストリビューションが WSL 2
+  であることも確認します。
+* `GDK_BACKEND=wayland` で起動できない場合は `GDK_BACKEND` を指定せずに
+  `/usr/local/bin/emacs -Q` を試します。GTK が利用可能なバックエンドを自動
+  選択します。`DISPLAY` や `WAYLAND_DISPLAY` を手動で固定しないでください。
+* GUI が出ない場合は、CachyOS のシェル内で `echo "$WAYLAND_DISPLAY"` と
+  `command -v emacs` を確認し、`GDK_BACKEND=wayland /usr/local/bin/emacs -Q`
+  を実行してエラーを確認します。
+* ビルド設定を変更してやり直す場合は、ソースディレクトリで
+  `make distclean` を実行してから `./configure` 以降を再実行します。
+
+参考資料（公式）
+----------------
+CachyOS WSL イメージ:
+https://github.com/CachyOS/cachyos-wsl
+https://github.com/CachyOS/cachyos-wsl/releases/latest
+
+Microsoft: WSL のインストール:
+https://learn.microsoft.com/windows/wsl/install
+
+Microsoft: WSL で Linux GUI アプリを実行:
+https://learn.microsoft.com/windows/wsl/tutorials/gui-apps
+
+GNU Emacs ソースとビルド手順:
+https://ftp.gnu.org/gnu/emacs/
+https://raw.githubusercontent.com/emacs-mirror/emacs/master/INSTALL
